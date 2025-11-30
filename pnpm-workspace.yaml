@@ -1,0 +1,2 @@
+overrides:
+  '@casoon/fragment-renderer': link:../fragment-renderer

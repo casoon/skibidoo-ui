@@ -23,7 +23,58 @@ export interface UIComponentDef {
  * All UI component definitions
  */
 export const uiComponentDefs: UIComponentDef[] = [
+  // ─────────────────────────────────────────────────────────────────
+  // General Components
+  // ─────────────────────────────────────────────────────────────────
+  {
+    id: "ui-button",
+    path: "@casoon/skibidoo-ui/components/button/Button.astro",
+    meta: {
+      category: "general",
+      tags: ["interactive", "action"],
+      description: "Button with variants, sizes, loading state",
+    },
+  },
+  {
+    id: "ui-card",
+    path: "@casoon/skibidoo-ui/components/card/Card.astro",
+    meta: {
+      category: "general",
+      tags: ["layout", "container"],
+      description: "Card container with variants",
+    },
+  },
+  {
+    id: "ui-alert",
+    path: "@casoon/skibidoo-ui/components/alert/Alert.astro",
+    meta: {
+      category: "general",
+      tags: ["feedback", "notification"],
+      description: "Alert box for info, success, warning, error",
+    },
+  },
+
+  // ─────────────────────────────────────────────────────────────────
   // Form Components
+  // ─────────────────────────────────────────────────────────────────
+  {
+    id: "ui-input",
+    path: "@casoon/skibidoo-ui/components/input/Input.astro",
+    meta: {
+      category: "form",
+      tags: ["interactive", "input"],
+      description: "Text input with label, error, hint",
+    },
+  },
+  {
+    id: "ui-select",
+    path: "@casoon/skibidoo-ui/components/select/Select.astro",
+    meta: {
+      category: "form",
+      tags: ["interactive", "input", "dropdown"],
+      description: "Select dropdown with options",
+    },
+  },
   {
     id: "ui-form",
     path: "@casoon/skibidoo-ui/components/form/Form.astro",
@@ -43,7 +94,9 @@ export const uiComponentDefs: UIComponentDef[] = [
     },
   },
 
+  // ─────────────────────────────────────────────────────────────────
   // Data Display Components
+  // ─────────────────────────────────────────────────────────────────
   {
     id: "ui-grid",
     path: "@casoon/skibidoo-ui/components/grid/Grid.astro",
@@ -54,7 +107,9 @@ export const uiComponentDefs: UIComponentDef[] = [
     },
   },
 
+  // ─────────────────────────────────────────────────────────────────
   // Overlay Components
+  // ─────────────────────────────────────────────────────────────────
   {
     id: "ui-modal",
     path: "@casoon/skibidoo-ui/components/modal/Modal.astro",
@@ -88,7 +143,7 @@ export function createUIRegistry(): RegistryEntry[] {
  * Create a partial registry with only specific components
  * 
  * @example
- * const formComponents = createPartialRegistry(['ui-form', 'ui-datepicker']);
+ * const formComponents = createPartialRegistry(['ui-input', 'ui-select', 'ui-button']);
  */
 export function createPartialRegistry(ids: string[]): RegistryEntry[] {
   const filtered = uiComponentDefs.filter((def) => ids.includes(def.id));
@@ -126,4 +181,12 @@ export function getComponentDef(id: string): UIComponentDef | undefined {
  */
 export function listComponentIds(): string[] {
   return uiComponentDefs.map((def) => def.id);
+}
+
+/**
+ * List all available categories
+ */
+export function listCategories(): string[] {
+  const categories = new Set(uiComponentDefs.map((def) => def.meta?.category).filter(Boolean));
+  return Array.from(categories) as string[];
 }
