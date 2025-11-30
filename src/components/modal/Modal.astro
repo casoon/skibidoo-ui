@@ -1,0 +1,154 @@
+---
+import type { ModalProps } from "../../types/index.js";
+
+interface Props extends ModalProps {
+  __id?: string;
+  __hydrate?: boolean;
+  __content?: string;
+}
+
+const {
+  title,
+  size = "md",
+  closable = true,
+  closeOnOverlay = true,
+  closeOnEscape = true,
+  showFooter = true,
+  className = "",
+  __id = "modal",
+  __hydrate = false,
+  __content = "",
+} = Astro.props;
+---
+
+<div
+  class:list={["ui-modal", `ui-modal--${size}`, className]}
+  id={__id}
+  data-component="modal"
+  data-props={JSON.stringify({ closable, closeOnOverlay, closeOnEscape })}
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby={`${__id}-title`}
+  hidden
+>
+  <div class="ui-modal__backdrop" data-action="close-overlay"></div>
+  <div class="ui-modal__container">
+    {(title || closable) && (
+      <header class="ui-modal__header">
+        {title && <h2 class="ui-modal__title" id={`${__id}-title`}>{title}</h2>}
+        {closable && (
+          <button class="ui-modal__close" data-action="close" aria-label="Schliessen">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z"/>
+            </svg>
+          </button>
+        )}
+      </header>
+    )}
+    <div class="ui-modal__body">
+      <slot />
+      <Fragment set:html={__content} />
+    </div>
+    {showFooter && (
+      <footer class="ui-modal__footer">
+        <slot name="footer" />
+      </footer>
+    )}
+  </div>
+</div>
+
+{__hydrate && (
+  <script define:vars={{ modalId: __id }}>
+    window.__UI_HYDRATE__ = window.__UI_HYDRATE__ || [];
+    window.__UI_HYDRATE__.push(modalId);
+  </script>
+)}
+
+<style>
+  .ui-modal {
+    position: fixed;
+    inset: 0;
+    z-index: var(--ui-z-modal, 400);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--ui-space-md, 16px);
+  }
+
+  .ui-modal[hidden] {
+    display: none;
+  }
+
+  .ui-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: var(--ui-overlay, rgba(0, 0, 0, 0.5));
+  }
+
+  .ui-modal__container {
+    position: relative;
+    background: var(--ui-surface, #fff);
+    border-radius: var(--ui-radius-lg, 8px);
+    box-shadow: var(--ui-shadow-lg);
+    max-height: calc(100vh - 32px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .ui-modal--sm .ui-modal__container { width: 400px; }
+  .ui-modal--md .ui-modal__container { width: 560px; }
+  .ui-modal--lg .ui-modal__container { width: 800px; }
+  .ui-modal--xl .ui-modal__container { width: 1140px; }
+  .ui-modal--fullscreen .ui-modal__container {
+    width: calc(100vw - 32px);
+    height: calc(100vh - 32px);
+  }
+
+  .ui-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--ui-space-md, 16px);
+    border-bottom: 1px solid var(--ui-border-color, #dee2e6);
+  }
+
+  .ui-modal__title {
+    margin: 0;
+    font-size: var(--ui-font-size-lg, 16px);
+    font-weight: var(--ui-font-weight-semibold, 600);
+  }
+
+  .ui-modal__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: var(--ui-radius, 4px);
+    cursor: pointer;
+    color: var(--ui-text-secondary, #6c757d);
+    transition: background var(--ui-duration-fast, 150ms);
+  }
+
+  .ui-modal__close:hover {
+    background: var(--ui-hover, #f8f9fa);
+  }
+
+  .ui-modal__body {
+    padding: var(--ui-space-md, 16px);
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .ui-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--ui-space-sm, 8px);
+    padding: var(--ui-space-md, 16px);
+    border-top: 1px solid var(--ui-border-color, #dee2e6);
+  }
+</style>

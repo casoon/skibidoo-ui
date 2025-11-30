@@ -1,0 +1,128 @@
+---
+import type { DatePickerProps } from "../../types/index.js";
+
+interface Props extends DatePickerProps {
+  __id?: string;
+  __hydrate?: boolean;
+}
+
+const {
+  name,
+  label,
+  value,
+  min,
+  max,
+  format = "dd.MM.yyyy",
+  placeholder = "TT.MM.JJJJ",
+  required = false,
+  disabled = false,
+  className = "",
+  __id = "datepicker",
+  __hydrate = false,
+} = Astro.props;
+
+function formatDate(date: string | Date | undefined): string {
+  if (!date) return "";
+  const d = typeof date === "string" ? new Date(date) : date;
+  return d.toISOString().split("T")[0];
+}
+---
+
+<div
+  class:list={["ui-datepicker", className, { "ui-datepicker--disabled": disabled }]}
+  id={__id}
+  data-component="datepicker"
+  data-props={JSON.stringify({ name, format, min: formatDate(min), max: formatDate(max) })}
+>
+  {label && (
+    <label class="ui-datepicker__label" for={`${__id}-input`}>
+      {label}
+      {required && <span class="ui-datepicker__required">*</span>}
+    </label>
+  )}
+  <div class="ui-datepicker__wrapper">
+    <input
+      type="date"
+      class="ui-datepicker__input"
+      id={`${__id}-input`}
+      name={name}
+      value={formatDate(value)}
+      min={formatDate(min)}
+      max={formatDate(max)}
+      placeholder={placeholder}
+      required={required}
+      disabled={disabled}
+    />
+    <span class="ui-datepicker__icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+        <path d="M4 0a1 1 0 011 1v1h6V1a1 1 0 112 0v1h1a2 2 0 012 2v10a2 2 0 01-2 2H2a2 2 0 01-2-2V4a2 2 0 012-2h1V1a1 1 0 011-1zm10 6H2v8h12V6z"/>
+      </svg>
+    </span>
+  </div>
+</div>
+
+{__hydrate && (
+  <script define:vars={{ dpId: __id }}>
+    window.__UI_HYDRATE__ = window.__UI_HYDRATE__ || [];
+    window.__UI_HYDRATE__.push(dpId);
+  </script>
+)}
+
+<style>
+  .ui-datepicker {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ui-space-xs, 4px);
+  }
+
+  .ui-datepicker__label {
+    font-weight: 500;
+    color: var(--ui-text, #333);
+  }
+
+  .ui-datepicker__required {
+    color: var(--ui-danger, #dc3545);
+    margin-left: 2px;
+  }
+
+  .ui-datepicker__wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .ui-datepicker__input {
+    width: 100%;
+    padding: var(--ui-space-sm, 8px) var(--ui-space-md, 12px);
+    padding-right: 40px;
+    border: 1px solid var(--ui-border-color, #dee2e6);
+    border-radius: var(--ui-radius, 4px);
+    font-size: var(--ui-font-size, 14px);
+    font-family: inherit;
+    background: var(--ui-surface, #fff);
+    color: var(--ui-text, #333);
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .ui-datepicker__input:focus {
+    outline: none;
+    border-color: var(--ui-primary, #0066cc);
+    box-shadow: 0 0 0 3px var(--ui-primary-alpha, rgba(0, 102, 204, 0.15));
+  }
+
+  .ui-datepicker__input:disabled {
+    background: var(--ui-disabled-bg, #e9ecef);
+    cursor: not-allowed;
+  }
+
+  .ui-datepicker__icon {
+    position: absolute;
+    right: 12px;
+    color: var(--ui-text-muted, #adb5bd);
+    pointer-events: none;
+  }
+
+  .ui-datepicker--disabled .ui-datepicker__icon {
+    opacity: 0.5;
+  }
+</style>

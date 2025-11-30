@@ -1,0 +1,91 @@
+{
+  "name": "@casoon/skibidoo-ui",
+  "version": "0.1.0",
+  "description": "SSR-first UI component library for Skibidoo - AHA-Stack (Astro + HTMX + Alpine.js + Tailwind)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js"
+    },
+    "./components/*": {
+      "types": "./dist/components/*/index.d.ts",
+      "import": "./dist/components/*/index.js"
+    },
+    "./styles": "./dist/styles/index.css",
+    "./styles/*": "./dist/styles/*",
+    "./themes/*": "./dist/styles/themes/*"
+  },
+  "files": [
+    "dist",
+    "src/components/**/*.astro"
+  ],
+  "scripts": {
+    "build": "tsup && pnpm build:css",
+    "build:css": "cp -r src/styles dist/",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "lint": "biome check src/",
+    "format": "biome format --write src/"
+  },
+  "keywords": [
+    "skibidoo",
+    "ui",
+    "components",
+    "astro",
+    "htmx",
+    "alpinejs",
+    "tailwindcss",
+    "aha-stack",
+    "ssr",
+    "fragments"
+  ],
+  "author": "casoon",
+  "license": "LGPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/casoon/skibidoo-ui.git"
+  },
+  "homepage": "https://github.com/casoon/skibidoo-ui",
+  "bugs": {
+    "url": "https://github.com/casoon/skibidoo-ui/issues"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "@casoon/fragment-renderer": "^0.1.0"
+  },
+  "peerDependencies": {
+    "astro": ">=5.0.0",
+    "tailwindcss": ">=4.0.0",
+    "htmx.org": ">=2.0.0",
+    "alpinejs": ">=3.14.0"
+  },
+  "peerDependenciesMeta": {
+    "htmx.org": {
+      "optional": true
+    },
+    "alpinejs": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0",
+    "@types/node": "^22.0.0",
+    "astro": "^5.0.0",
+    "tailwindcss": "^4.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.6.0"
+  },
+  "volta": {
+    "node": "22.11.0"
+  }
+}
