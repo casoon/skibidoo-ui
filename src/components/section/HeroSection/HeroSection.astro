@@ -1,0 +1,124 @@
+---
+/**
+ * HeroSection - Animierte Hero-Sektion mit verschiedenen Varianten
+ */
+
+export interface Props {
+  variant?: "mask-reveal" | "simple" | "parallax" | "video";
+  logoUrl?: string;
+  backgroundUrl?: string;
+  backgroundSecondaryUrl?: string;
+  videoUrl?: string;
+  height?: "full" | "large" | "medium" | "small";
+  overlayColor?: string;
+  overlayOpacity?: number;
+  maskColor?: string;
+  animationDuration?: number;
+  pauseDuration?: number;
+  logoSize?: number;
+  __id?: string;
+  __hydrate?: boolean;
+}
+
+const {
+  variant = "simple",
+  logoUrl,
+  backgroundUrl,
+  backgroundSecondaryUrl,
+  videoUrl,
+  height = "full",
+  overlayColor = "black",
+  overlayOpacity = 40,
+  maskColor = "white",
+  animationDuration = 5,
+  pauseDuration = 1.5,
+  logoSize = 10,
+  __id = `hero-${Math.random().toString(36).slice(2, 9)}`,
+  __hydrate = false,
+} = Astro.props;
+
+const heightClasses: Record<string, string> = {
+  full: "h-screen",
+  large: "h-[80vh]",
+  medium: "h-[60vh]",
+  small: "h-[40vh]",
+};
+const heightClass = heightClasses[height];
+---
+
+<section 
+  id={__id}
+  class:list={["hero-section relative w-full overflow-hidden", heightClass]}
+  data-component="hero-section"
+  data-variant={variant}
+>
+  <div class="absolute inset-0 z-0">
+    {variant === "video" && videoUrl ? (
+      <video class="w-full h-full object-cover" autoplay muted loop playsinline>
+        <source src={videoUrl} type="video/mp4" />
+      </video>
+    ) : (
+      <>
+        {backgroundUrl && (
+          <img
+            src={backgroundUrl}
+            alt=""
+            class:list={[
+              "hero-bg-primary absolute inset-0 w-full h-full object-cover",
+              variant === "mask-reveal" && "scale-[1.2] brightness-[0.4]"
+            ]}
+          />
+        )}
+        {variant === "mask-reveal" && backgroundSecondaryUrl && (
+          <img
+            src={backgroundSecondaryUrl}
+            alt=""
+            class="hero-bg-secondary absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-[2500ms]"
+          />
+        )}
+      </>
+    )}
+  </div>
+
+  {variant !== "mask-reveal" && (
+    <div 
+      class="absolute inset-0 z-[1]"
+      style={`background-color: ${overlayColor}; opacity: ${overlayOpacity / 100};`}
+    />
+  )}
+
+  {variant === "mask-reveal" && (
+    <div class="hero-mask-container absolute inset-0 z-[2] pointer-events-none">
+      <svg class="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <mask id={`${__id}-mask`}>
+            <rect width="100%" height="100%" fill="white" />
+            <rect class="hero-mask-hole" x="45" y="45" width="10" height="10" fill="black" />
+          </mask>
+        </defs>
+        <rect width="100%" height="100%" fill={maskColor} mask={`url(#${__id}-mask)`} />
+        {logoUrl && (
+          <g transform="translate(50, 50)">
+            <image class="hero-logo" href={logoUrl} x={-logoSize / 2} y="-5" width={logoSize} height={logoSize} />
+          </g>
+        )}
+      </svg>
+    </div>
+  )}
+
+  <div class="relative z-[3] h-full flex items-center justify-center">
+    <slot />
+  </div>
+</section>
+
+<style>
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-section.animate .hero-bg-primary {
+      animation: hero-bg-zoom 2.5s ease-out forwards;
+    }
+  }
+  @keyframes hero-bg-zoom {
+    from { transform: scale(1.2); filter: brightness(0.4); }
+    to { transform: scale(1); filter: brightness(0.6); }
+  }
+</style>

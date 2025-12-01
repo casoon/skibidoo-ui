@@ -1,0 +1,275 @@
+---
+/**
+ * AnimatedBackground - Canvas-basierte animierte Hintergruende
+ * 
+ * Varianten: particles, pixel-grid, swarm, waves
+ */
+
+export interface Props {
+  variant?: "particles" | "pixel-grid" | "swarm" | "waves";
+  color?: "green" | "blue" | "purple" | "orange" | string;
+  backgroundColor?: string;
+  particleCount?: number;
+  speed?: number;
+  height?: string;
+  opacity?: number;
+  gridSpacing?: number;
+  swarmCount?: number;
+  __id?: string;
+  __hydrate?: boolean;
+}
+
+const {
+  variant = "particles",
+  color = "green",
+  backgroundColor = "#000000",
+  particleCount = 30,
+  speed = 1.0,
+  height = "400px",
+  opacity = 100,
+  gridSpacing = 20,
+  swarmCount = 3,
+  __id = `canvas-${Math.random().toString(36).slice(2, 9)}`,
+  __hydrate = true,
+} = Astro.props;
+
+const colorPresets: Record<string, { r: number; g: number; b: number }> = {
+  green: { r: 0, g: 255, b: 128 },
+  blue: { r: 0, g: 180, b: 255 },
+  purple: { r: 180, g: 100, b: 255 },
+  orange: { r: 255, g: 140, b: 0 },
+};
+
+const resolvedColor = colorPresets[color] || colorPresets.green;
+
+const controllerProps = {
+  variant,
+  color: resolvedColor,
+  backgroundColor,
+  particleCount,
+  speed,
+  opacity: opacity / 100,
+  gridSpacing,
+  swarmCount,
+};
+---
+
+<div 
+  id={__id}
+  class="animated-background relative w-full overflow-hidden"
+  style={`height: ${height}; background-color: ${backgroundColor};`}
+  data-component="animated-background"
+  data-props={JSON.stringify(controllerProps)}
+>
+  <canvas class="canvas-element absolute inset-0 w-full h-full block" aria-hidden="true" />
+  
+  <noscript>
+    <div 
+      class="absolute inset-0"
+      style={`background: linear-gradient(135deg, ${backgroundColor} 0%, rgba(${resolvedColor.r}, ${resolvedColor.g}, ${resolvedColor.b}, 0.1) 100%);`}
+    />
+  </noscript>
+  
+  <div class="relative z-10 h-full">
+    <slot />
+  </div>
+</div>
+
+{__hydrate && (
+  <script define:vars={{ id: __id, props: controllerProps }}>
+    (function() {
+      const container = document.getElementById(id);
+      if (!container) return;
+      
+      const canvas = container.querySelector('canvas');
+      if (!canvas) return;
+      
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) {
+        ctx.fillStyle = props.backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+      
+      function resize() {
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+      }
+      
+      window.addEventListener('resize', resize);
+      resize();
+      
+      let animationId;
+      const { variant, color, particleCount, speed, opacity, gridSpacing, swarmCount } = props;
+      
+      if (variant === 'particles') {
+        const particles = Array.from({ length: particleCount }, () => ({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          r: 40 + Math.random() * 60,
+          vx: (0.2 + Math.random() * 0.3) * speed,
+          vy: (0.2 + Math.random() * 0.3) * speed,
+          phase: Math.random() * Math.PI * 2,
+          stretch: 1 + Math.random() * 1.5,
+        }));
+        
+        function animateParticles() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          for (const p of particles) {
+            p.phase += 0.01 * speed;
+            p.x += Math.cos(p.phase) * p.vx;
+            p.y += Math.sin(p.phase) * p.vy;
+            if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.phase);
+            ctx.scale(p.stretch, 1);
+            const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, p.r);
+            grad.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, ${0.15 * opacity})`);
+            grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad;
+            ctx.shadowColor = `rgba(${color.r}, ${color.g}, ${color.b}, ${0.3 * opacity})`;
+            ctx.shadowBlur = 40;
+            ctx.beginPath();
+            ctx.arc(0, 0, p.r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+          animationId = requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+      }
+      
+      else if (variant === 'pixel-grid') {
+        const cols = Math.floor(canvas.width / gridSpacing);
+        const rows = Math.floor(canvas.height / gridSpacing);
+        const size = 2;
+        const points = [];
+        for (let y = 0; y < rows; y++) {
+          for (let x = 0; x < cols; x++) {
+            points.push({
+              x: x * gridSpacing,
+              y: y * gridSpacing,
+              alpha: Math.random(),
+              speed: (0.005 + Math.random() * 0.01) * speed,
+            });
+          }
+        }
+        function animateGrid() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          for (const point of points) {
+            point.alpha += point.speed;
+            if (point.alpha > 1 || point.alpha < 0) point.speed *= -1;
+            ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${point.alpha * opacity})`;
+            ctx.fillRect(point.x, point.y, size, size);
+          }
+          animationId = requestAnimationFrame(animateGrid);
+        }
+        animateGrid();
+      }
+      
+      else if (variant === 'swarm') {
+        const swarms = [];
+        const colors = [
+          color,
+          { r: color.r * 0.7, g: color.g * 0.7 + 75, b: color.b * 0.7 },
+          { r: color.r * 0.5 + 127, g: color.g * 0.5, b: color.b * 0.5 },
+        ];
+        for (let s = 0; s < swarmCount; s++) {
+          const swarmColor = colors[s % colors.length];
+          const leader = {
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            angle: Math.random() * Math.PI * 2,
+            speed: (0.5 + Math.random() * 0.3) * speed,
+          };
+          const particles = [];
+          const particlesPerSwarm = Math.floor(particleCount / swarmCount);
+          for (let i = 0; i < particlesPerSwarm; i++) {
+            particles.push({
+              x: leader.x + (Math.random() - 0.5) * 50,
+              y: leader.y + (Math.random() - 0.5) * 50,
+              vx: 0, vy: 0,
+              size: 0.8 + Math.random() * 0.8,
+              opacity: 0.4 + Math.random() * 0.5,
+            });
+          }
+          swarms.push({ leader, particles, color: swarmColor, turnTimer: 0 });
+        }
+        function animateSwarm() {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          for (const swarm of swarms) {
+            const { leader, particles, color: swarmColor } = swarm;
+            swarm.turnTimer++;
+            if (swarm.turnTimer > 150) {
+              leader.angle += (Math.random() - 0.5) * 1.5;
+              swarm.turnTimer = 0;
+            }
+            leader.x += Math.cos(leader.angle) * leader.speed;
+            leader.y += Math.sin(leader.angle) * leader.speed;
+            if (leader.x < 50 || leader.x > canvas.width - 50) leader.angle = Math.PI - leader.angle;
+            if (leader.y < 50 || leader.y > canvas.height - 50) leader.angle = -leader.angle;
+            for (const p of particles) {
+              const dx = leader.x - p.x;
+              const dy = leader.y - p.y;
+              p.vx += dx * 0.01;
+              p.vy += dy * 0.01;
+              p.vx *= 0.95;
+              p.vy *= 0.95;
+              p.x += p.vx;
+              p.y += p.vy;
+              ctx.beginPath();
+              ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(${swarmColor.r}, ${swarmColor.g}, ${swarmColor.b}, ${p.opacity * opacity})`;
+              ctx.fill();
+            }
+          }
+          animationId = requestAnimationFrame(animateSwarm);
+        }
+        animateSwarm();
+      }
+      
+      else if (variant === 'waves') {
+        let time = 0;
+        function animateWaves() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          time += 0.02 * speed;
+          for (let i = 0; i < 3; i++) {
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            for (let x = 0; x <= canvas.width; x += 5) {
+              const y = canvas.height * 0.5 
+                + Math.sin(x * 0.01 + time + i * 0.5) * 30 
+                + Math.sin(x * 0.02 + time * 1.5) * 20
+                + i * 40;
+              ctx.lineTo(x, y);
+            }
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.closePath();
+            const waveOpacity = (0.1 - i * 0.02) * opacity;
+            ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${waveOpacity})`;
+            ctx.fill();
+          }
+          animationId = requestAnimationFrame(animateWaves);
+        }
+        animateWaves();
+      }
+      
+      container.addEventListener('remove', () => {
+        if (animationId) cancelAnimationFrame(animationId);
+        window.removeEventListener('resize', resize);
+      });
+    })();
+  </script>
+)}
+
+<style>
+  @media (prefers-reduced-motion: reduce) {
+    .animated-background canvas { display: none; }
+  }
+</style>
