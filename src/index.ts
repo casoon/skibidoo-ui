@@ -1,9 +1,9 @@
 // @casoon/skibidoo-ui - SSR-first UI Components
 // Built on @casoon/fragment-renderer
 
+export type { UIFramework } from "./runtime/index.js";
 // Runtime
 export { createUIFramework } from "./runtime/index.js";
-export type { UIFramework } from "./runtime/index.js";
 
 // Types
 export type {

@@ -195,7 +195,7 @@ src/
 
 ## Requirements
 
-- Node.js >= 22
+- Node.js >= 24
 - Astro >= 5.0
 - @casoon/fragment-renderer >= 0.1.1
 

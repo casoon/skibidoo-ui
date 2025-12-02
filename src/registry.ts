@@ -4,18 +4,18 @@
  * Components are statically imported to work with Astro's compilation.
  */
 import type { ComponentMeta, RegistryEntry } from "@casoon/fragment-renderer";
-import { gridStyles } from "./styles/grid.js";
+import Alert from "./components/alert/Alert.astro";
 
 // Static imports for all components
 import Button from "./components/button/Button.astro";
 import Card from "./components/card/Card.astro";
-import Alert from "./components/alert/Alert.astro";
-import Input from "./components/input/Input.astro";
-import Select from "./components/select/Select.astro";
-import Form from "./components/form/Form.astro";
 import DatePicker from "./components/datepicker/DatePicker.astro";
+import Form from "./components/form/Form.astro";
 import Grid from "./components/grid/Grid.astro";
+import Input from "./components/input/Input.astro";
 import Modal from "./components/modal/Modal.astro";
+import Select from "./components/select/Select.astro";
+import { gridStyles } from "./styles/grid.js";
 
 /**
  * Component definition
