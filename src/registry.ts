@@ -1,18 +1,28 @@
 /**
  * Central component registry for @casoon/skibidoo-ui
- * 
- * The registry provides component definitions that are resolved at runtime
- * in the consumer's Astro/Vite context.
+ *
+ * Components are statically imported to work with Astro's compilation.
  */
 import type { ComponentMeta, RegistryEntry } from "@casoon/fragment-renderer";
 import { gridStyles } from "./styles/grid.js";
 
+// Static imports for all components
+import Button from "./components/button/Button.astro";
+import Card from "./components/card/Card.astro";
+import Alert from "./components/alert/Alert.astro";
+import Input from "./components/input/Input.astro";
+import Select from "./components/select/Select.astro";
+import Form from "./components/form/Form.astro";
+import DatePicker from "./components/datepicker/DatePicker.astro";
+import Grid from "./components/grid/Grid.astro";
+import Modal from "./components/modal/Modal.astro";
+
 /**
- * Component definition with path (resolved at runtime)
+ * Component definition
  */
 export interface UIComponentDef {
 	id: string;
-	path: string;
+	component: unknown;
 	meta?: ComponentMeta;
 	styles?: string;
 }
@@ -23,60 +33,95 @@ export interface UIComponentDef {
 export const uiComponentDefs: UIComponentDef[] = [
 	{
 		id: "ui-button",
-		path: "@casoon/skibidoo-ui/src/components/button/Button.astro",
-		meta: { category: "general", tags: ["interactive", "action"], description: "Button with variants" },
+		component: Button,
+		meta: {
+			category: "general",
+			tags: ["interactive", "action"],
+			description: "Button with variants",
+		},
 	},
 	{
 		id: "ui-card",
-		path: "@casoon/skibidoo-ui/src/components/card/Card.astro",
-		meta: { category: "general", tags: ["layout", "container"], description: "Card container" },
+		component: Card,
+		meta: {
+			category: "general",
+			tags: ["layout", "container"],
+			description: "Card container",
+		},
 	},
 	{
 		id: "ui-alert",
-		path: "@casoon/skibidoo-ui/src/components/alert/Alert.astro",
-		meta: { category: "general", tags: ["feedback", "notification"], description: "Alert box" },
+		component: Alert,
+		meta: {
+			category: "general",
+			tags: ["feedback", "notification"],
+			description: "Alert box",
+		},
 	},
 	{
 		id: "ui-input",
-		path: "@casoon/skibidoo-ui/src/components/input/Input.astro",
-		meta: { category: "form", tags: ["interactive", "input"], description: "Text input" },
+		component: Input,
+		meta: {
+			category: "form",
+			tags: ["interactive", "input"],
+			description: "Text input",
+		},
 	},
 	{
 		id: "ui-select",
-		path: "@casoon/skibidoo-ui/src/components/select/Select.astro",
-		meta: { category: "form", tags: ["interactive", "dropdown"], description: "Select dropdown" },
+		component: Select,
+		meta: {
+			category: "form",
+			tags: ["interactive", "dropdown"],
+			description: "Select dropdown",
+		},
 	},
 	{
 		id: "ui-form",
-		path: "@casoon/skibidoo-ui/src/components/form/Form.astro",
-		meta: { category: "form", tags: ["interactive", "input"], description: "Dynamic form" },
+		component: Form,
+		meta: {
+			category: "form",
+			tags: ["interactive", "input"],
+			description: "Dynamic form",
+		},
 	},
 	{
 		id: "ui-datepicker",
-		path: "@casoon/skibidoo-ui/src/components/datepicker/DatePicker.astro",
-		meta: { category: "form", tags: ["interactive", "date"], description: "Date picker" },
+		component: DatePicker,
+		meta: {
+			category: "form",
+			tags: ["interactive", "date"],
+			description: "Date picker",
+		},
 	},
 	{
 		id: "ui-grid",
-		path: "@casoon/skibidoo-ui/src/components/grid/Grid.astro",
-		meta: { category: "data", tags: ["table", "sortable", "paginated"], description: "Data grid" },
+		component: Grid,
+		meta: {
+			category: "data",
+			tags: ["table", "sortable", "paginated"],
+			description: "Data grid",
+		},
 		styles: gridStyles,
 	},
 	{
 		id: "ui-modal",
-		path: "@casoon/skibidoo-ui/src/components/modal/Modal.astro",
-		meta: { category: "overlay", tags: ["interactive", "dialog"], description: "Modal dialog" },
+		component: Modal,
+		meta: {
+			category: "overlay",
+			tags: ["interactive", "dialog"],
+			description: "Modal dialog",
+		},
 	},
 ];
 
 /**
  * Create registry entries for fragment-renderer.
- * Uses dynamic imports that are resolved by Vite at runtime.
  */
 export function createUIRegistry(): RegistryEntry[] {
 	return uiComponentDefs.map((def) => ({
 		id: def.id,
-		loader: () => import(/* @vite-ignore */ def.path),
+		loader: () => Promise.resolve({ default: def.component }),
 		meta: def.meta,
 		styles: def.styles,
 	}));
@@ -86,24 +131,28 @@ export function createUIRegistry(): RegistryEntry[] {
  * Create a partial registry with only specific components
  */
 export function createPartialRegistry(ids: string[]): RegistryEntry[] {
-	return uiComponentDefs.filter((def) => ids.includes(def.id)).map((def) => ({
-		id: def.id,
-		loader: () => import(/* @vite-ignore */ def.path),
-		meta: def.meta,
-		styles: def.styles,
-	}));
+	return uiComponentDefs
+		.filter((def) => ids.includes(def.id))
+		.map((def) => ({
+			id: def.id,
+			loader: () => Promise.resolve({ default: def.component }),
+			meta: def.meta,
+			styles: def.styles,
+		}));
 }
 
 /**
  * Create registry filtered by category
  */
 export function createRegistryByCategory(category: string): RegistryEntry[] {
-	return uiComponentDefs.filter((def) => def.meta?.category === category).map((def) => ({
-		id: def.id,
-		loader: () => import(/* @vite-ignore */ def.path),
-		meta: def.meta,
-		styles: def.styles,
-	}));
+	return uiComponentDefs
+		.filter((def) => def.meta?.category === category)
+		.map((def) => ({
+			id: def.id,
+			loader: () => Promise.resolve({ default: def.component }),
+			meta: def.meta,
+			styles: def.styles,
+		}));
 }
 
 /**
@@ -124,5 +173,9 @@ export function listComponentIds(): string[] {
  * List all available categories
  */
 export function listCategories(): string[] {
-	return [...new Set(uiComponentDefs.map((def) => def.meta?.category).filter(Boolean))] as string[];
+	return [
+		...new Set(
+			uiComponentDefs.map((def) => def.meta?.category).filter(Boolean),
+		),
+	] as string[];
 }

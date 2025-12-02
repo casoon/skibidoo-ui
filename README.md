@@ -1,118 +1,164 @@
-# @skibidoo/ui
+# @casoon/skibidoo-ui
 
-SSR-first UI component framework built on [@casoon/fragment-renderer](https://github.com/casoon/fragment-renderer).
+SSR-first UI component library for the AHA-Stack (Astro + HTMX + Alpine.js + Tailwind).
+
+Built on [@casoon/fragment-renderer](https://github.com/casoon/fragment-renderer) for server-side component rendering with automatic style delivery.
 
 ## Features
 
-- **SSR-First**: Components render on the server, hydrate on client
+- **SSR-First**: Components render on the server with fragment-renderer
+- **Registry Pattern**: Central component registry for dynamic rendering
+- **Style Delivery**: Automatic CSS injection via fragment-renderer
 - **Progressive Enhancement**: Works without JavaScript
-- **Small Bundle**: Only client logic is shipped to browser
-- **Design Tokens**: Consistent theming with CSS Custom Properties
 - **HTMX Compatible**: Fragment-based partial updates
 - **TypeScript**: Full type safety
 
 ## Installation
 
 ```bash
-npm install @skibidoo/ui @casoon/fragment-renderer astro
+npm install @casoon/skibidoo-ui @casoon/fragment-renderer astro
 ```
 
 ## Quick Start
 
-### Server-Side
+### Using the Registry with fragment-renderer
+
+The recommended approach is using the component registry with `@casoon/fragment-renderer`:
 
 ```typescript
-import { createUIFramework } from "@skibidoo/ui";
+import { createAstroRuntime } from "@casoon/fragment-renderer";
+import { createPartialRegistry } from "@casoon/skibidoo-ui/registry";
 
-const ui = createUIFramework({
-  theme: "light",
-  locale: "de",
+// Create runtime with selected components
+const runtime = createAstroRuntime({
+  components: createPartialRegistry(["ui-grid", "ui-form"]),
 });
 
-// Render a Grid
-const gridHtml = await ui.renderGrid({
-  columns: [
-    { field: "name", label: "Name" },
-    { field: "email", label: "E-Mail" },
-  ],
-  data: users,
-  pagination: true,
-  sorting: true,
-});
-
-// Render a Form
-const formHtml = await ui.renderForm({
-  fields: [
-    { name: "email", label: "E-Mail", type: "email", required: true },
-    { name: "password", label: "Passwort", type: "password", required: true },
-  ],
-  action: "/api/login",
-  submitLabel: "Anmelden",
+// Render a component by ID
+const html = await runtime.renderToString({
+  componentId: "ui-grid",
+  props: {
+    columns: [
+      { field: "name", label: "Name", sortable: true },
+      { field: "email", label: "E-Mail", sortable: true },
+    ],
+    data: users,
+    pagination: { pageSize: 10 },
+    sorting: true,
+  },
 });
 ```
 
-### Client-Side Hydration
+### Astro Config
 
-```html
-<link rel="stylesheet" href="@skibidoo/ui/styles">
+Add `@casoon/skibidoo-ui` to your Vite SSR config to enable Astro component compilation:
 
-<script type="module">
-  import { initUIFramework } from "@skibidoo/ui/client";
+```javascript
+// astro.config.mjs
+export default defineConfig({
+  vite: {
+    ssr: {
+      noExternal: ["@casoon/skibidoo-ui"],
+    },
+  },
+});
+```
 
-  const ui = initUIFramework();
+### Direct Component Import
 
-  // Configure specific component
-  ui.configure("grid-id", {
-    onSort: (field, direction) => console.log("Sort:", field, direction),
-    onPageChange: (page) => fetchPage(page),
+You can also import components directly in Astro pages:
+
+```astro
+---
+import Grid from "@casoon/skibidoo-ui/src/components/grid/Grid.astro";
+import Form from "@casoon/skibidoo-ui/src/components/form/Form.astro";
+---
+
+<Grid
+  columns={columns}
+  data={data}
+  pagination={{ pageSize: 10 }}
+  sorting={true}
+/>
+```
+
+## Available Components
+
+| Component ID    | Description                    |
+|-----------------|--------------------------------|
+| `ui-button`     | Button with variants           |
+| `ui-card`       | Card container                 |
+| `ui-alert`      | Alert/notification box         |
+| `ui-input`      | Text input field               |
+| `ui-select`     | Select dropdown                |
+| `ui-form`       | Dynamic form with validation   |
+| `ui-datepicker` | Date picker                    |
+| `ui-grid`       | Data grid with sort/filter/pagination |
+| `ui-modal`      | Modal dialog                   |
+
+## Registry Functions
+
+```typescript
+import {
+  createUIRegistry,        // All components
+  createPartialRegistry,   // Selected components by ID
+  createRegistryByCategory,// Components by category
+  listComponentIds,        // List all IDs
+  listCategories,          // List all categories
+} from "@casoon/skibidoo-ui/registry";
+
+// Full registry
+const allComponents = createUIRegistry();
+
+// Partial registry
+const gridOnly = createPartialRegistry(["ui-grid"]);
+
+// By category: "general", "form", "data", "overlay"
+const formComponents = createRegistryByCategory("form");
+```
+
+## API Endpoint Example
+
+```typescript
+// src/pages/api/users.ts
+import { createAstroRuntime } from "@casoon/fragment-renderer";
+import { createPartialRegistry } from "@casoon/skibidoo-ui/registry";
+import type { APIRoute } from "astro";
+
+export const GET: APIRoute = async ({ url }) => {
+  const page = parseInt(url.searchParams.get("page") || "1");
+  
+  const runtime = createAstroRuntime({
+    components: createPartialRegistry(["ui-grid"]),
   });
-</script>
-```
 
-## Components
+  const html = await runtime.renderToString({
+    componentId: "ui-grid",
+    props: {
+      columns: gridColumns,
+      data: paginatedData,
+      pagination: { pageSize: 10 },
+      currentPage: page,
+      totalItems: totalCount,
+      endpoint: "/api/users",
+    },
+  });
 
-### Grid
-
-Full-featured data grid with sorting, pagination, filtering, and row selection.
-
-```typescript
-await ui.renderGrid({
-  columns: GridColumn[],
-  data: Record<string, unknown>[],
-  pagination?: boolean | PaginationOptions,
-  sorting?: boolean,
-  filtering?: boolean,
-  selection?: "none" | "single" | "multiple",
-  rowKey?: string,
-});
-```
-
-### Form
-
-Dynamic form generation with validation.
-
-```typescript
-await ui.renderForm({
-  fields: FormField[],
-  values?: Record<string, unknown>,
-  action?: string,
-  method?: "GET" | "POST",
-  layout?: "vertical" | "horizontal" | "inline",
-});
+  return new Response(html, {
+    headers: { "Content-Type": "text/html" },
+  });
+};
 ```
 
 ## Theming
 
-The framework uses CSS Custom Properties for theming.
+Components use CSS Custom Properties for theming.
 
 ### Built-in Themes
 
 ```html
-<!-- Light (default) -->
-<link rel="stylesheet" href="@skibidoo/ui/themes/light.css">
-
-<!-- Dark -->
-<link rel="stylesheet" href="@skibidoo/ui/themes/dark.css">
+<link rel="stylesheet" href="@casoon/skibidoo-ui/styles/themes/light.css">
+<link rel="stylesheet" href="@casoon/skibidoo-ui/styles/themes/dark.css">
 ```
 
 ### Custom Theme
@@ -121,57 +167,38 @@ The framework uses CSS Custom Properties for theming.
 :root {
   --ui-primary: #your-color;
   --ui-surface: #your-surface;
-  /* ... see tokens.css for all variables */
+  --ui-border-color: #your-border;
+  /* See dist/styles/tokens.css for all variables */
 }
-```
-
-## Events
-
-Components emit custom events for client-side interaction:
-
-```typescript
-// Grid events
-document.addEventListener("grid:sort", (e) => {});
-document.addEventListener("grid:pageChange", (e) => {});
-document.addEventListener("grid:selectionChange", (e) => {});
-document.addEventListener("grid:filter", (e) => {});
-
-// Form events
-document.addEventListener("form:submit", (e) => {});
-document.addEventListener("form:fieldChange", (e) => {});
-document.addEventListener("form:validationError", (e) => {});
 ```
 
 ## Project Structure
 
 ```
 src/
-  index.ts              # Main exports
-  runtime/              # SSR runtime (extends fragment-renderer)
-  components/           # Astro components + client controllers
-    grid/
-    form/
-    modal/
-    datepicker/
+  registry.ts           # Component registry (import from /registry)
+  runtime/              # SSR runtime utilities
+  components/           # Astro components
+    grid/Grid.astro
+    form/Form.astro
+    button/Button.astro
+    card/Card.astro
+    alert/Alert.astro
+    input/Input.astro
+    select/Select.astro
+    modal/Modal.astro
+    datepicker/DatePicker.astro
   client/               # Client-side hydration
   styles/               # CSS & themes
   types/                # TypeScript definitions
 ```
 
-## Development
-
-```bash
-npm install
-npm run build
-npm run dev
-```
-
 ## Requirements
 
-- Node.js >= 18
-- Astro >= 4.0
-- @casoon/fragment-renderer
+- Node.js >= 22
+- Astro >= 5.0
+- @casoon/fragment-renderer >= 0.1.1
 
 ## License
 
-MIT
+LGPL-3.0
