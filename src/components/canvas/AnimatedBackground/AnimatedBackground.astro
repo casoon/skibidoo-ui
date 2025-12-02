@@ -1,56 +1,56 @@
 ---
 /**
  * AnimatedBackground - Canvas-basierte animierte Hintergruende
- * 
+ *
  * Varianten: particles, pixel-grid, swarm, waves
  */
 
 export interface Props {
-  variant?: "particles" | "pixel-grid" | "swarm" | "waves";
-  color?: "green" | "blue" | "purple" | "orange" | string;
-  backgroundColor?: string;
-  particleCount?: number;
-  speed?: number;
-  height?: string;
-  opacity?: number;
-  gridSpacing?: number;
-  swarmCount?: number;
-  __id?: string;
-  __hydrate?: boolean;
+	variant?: "particles" | "pixel-grid" | "swarm" | "waves";
+	color?: "green" | "blue" | "purple" | "orange" | string;
+	backgroundColor?: string;
+	particleCount?: number;
+	speed?: number;
+	height?: string;
+	opacity?: number;
+	gridSpacing?: number;
+	swarmCount?: number;
+	__id?: string;
+	__hydrate?: boolean;
 }
 
 const {
-  variant = "particles",
-  color = "green",
-  backgroundColor = "#000000",
-  particleCount = 30,
-  speed = 1.0,
-  height = "400px",
-  opacity = 100,
-  gridSpacing = 20,
-  swarmCount = 3,
-  __id = `canvas-${Math.random().toString(36).slice(2, 9)}`,
-  __hydrate = true,
+	variant = "particles",
+	color = "green",
+	backgroundColor = "#000000",
+	particleCount = 30,
+	speed = 1.0,
+	height = "400px",
+	opacity = 100,
+	gridSpacing = 20,
+	swarmCount = 3,
+	__id = `canvas-${Math.random().toString(36).slice(2, 9)}`,
+	__hydrate = true,
 } = Astro.props;
 
 const colorPresets: Record<string, { r: number; g: number; b: number }> = {
-  green: { r: 0, g: 255, b: 128 },
-  blue: { r: 0, g: 180, b: 255 },
-  purple: { r: 180, g: 100, b: 255 },
-  orange: { r: 255, g: 140, b: 0 },
+	green: { r: 0, g: 255, b: 128 },
+	blue: { r: 0, g: 180, b: 255 },
+	purple: { r: 180, g: 100, b: 255 },
+	orange: { r: 255, g: 140, b: 0 },
 };
 
 const resolvedColor = colorPresets[color] || colorPresets.green;
 
 const controllerProps = {
-  variant,
-  color: resolvedColor,
-  backgroundColor,
-  particleCount,
-  speed,
-  opacity: opacity / 100,
-  gridSpacing,
-  swarmCount,
+	variant,
+	color: resolvedColor,
+	backgroundColor,
+	particleCount,
+	speed,
+	opacity: opacity / 100,
+	gridSpacing,
+	swarmCount,
 };
 ---
 

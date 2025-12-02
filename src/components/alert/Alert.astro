@@ -1,57 +1,56 @@
 ---
 export interface Props {
-  variant?: 'info' | 'success' | 'warning' | 'error';
-  title?: string;
-  dismissible?: boolean;
-  class?: string;
-  id?: string;
+	variant?: "info" | "success" | "warning" | "error";
+	title?: string;
+	dismissible?: boolean;
+	class?: string;
+	id?: string;
 }
 
 const {
-  variant = 'info',
-  title,
-  dismissible = false,
-  class: className = '',
-  id,
-  ...attrs
+	variant = "info",
+	title,
+	dismissible = false,
+	class: className = "",
+	id,
+	...attrs
 } = Astro.props;
 
-const variants: Record<string, { bg: string; border: string; text: string; icon: string }> = {
-  info: {
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
-    text: 'text-blue-800',
-    icon: 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-  },
-  success: {
-    bg: 'bg-green-50',
-    border: 'border-green-200',
-    text: 'text-green-800',
-    icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
-  },
-  warning: {
-    bg: 'bg-yellow-50',
-    border: 'border-yellow-200',
-    text: 'text-yellow-800',
-    icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z',
-  },
-  error: {
-    bg: 'bg-red-50',
-    border: 'border-red-200',
-    text: 'text-red-800',
-    icon: 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z',
-  },
+const variants: Record<
+	string,
+	{ bg: string; border: string; text: string; icon: string }
+> = {
+	info: {
+		bg: "bg-blue-50",
+		border: "border-blue-200",
+		text: "text-blue-800",
+		icon: "M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+	},
+	success: {
+		bg: "bg-green-50",
+		border: "border-green-200",
+		text: "text-green-800",
+		icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
+	},
+	warning: {
+		bg: "bg-yellow-50",
+		border: "border-yellow-200",
+		text: "text-yellow-800",
+		icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z",
+	},
+	error: {
+		bg: "bg-red-50",
+		border: "border-red-200",
+		text: "text-red-800",
+		icon: "M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z",
+	},
 };
 
 const v = variants[variant];
 
-const classes = [
-  'rounded-lg border p-4',
-  v.bg,
-  v.border,
-  v.text,
-  className,
-].filter(Boolean).join(' ');
+const classes = ["rounded-lg border p-4", v.bg, v.border, v.text, className]
+	.filter(Boolean)
+	.join(" ");
 
 const alertId = id || `alert-${Math.random().toString(36).substring(2, 8)}`;
 ---

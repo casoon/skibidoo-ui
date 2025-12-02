@@ -2,52 +2,52 @@
 @import "../tokens.css";
 
 [data-theme="dark"] {
-  /* Colors - Primary */
-  --ui-primary: #4da3ff;
-  --ui-primary-light: #1a3a5c;
-  --ui-primary-dark: #66b3ff;
-  --ui-primary-alpha: rgba(77, 163, 255, 0.2);
+	/* Colors - Primary */
+	--ui-primary: #4da3ff;
+	--ui-primary-light: #1a3a5c;
+	--ui-primary-dark: #66b3ff;
+	--ui-primary-alpha: rgba(77, 163, 255, 0.2);
 
-  /* Colors - Secondary */
-  --ui-secondary: #8b939b;
-  --ui-secondary-light: #3d4349;
-  --ui-secondary-dark: #adb5bd;
+	/* Colors - Secondary */
+	--ui-secondary: #8b939b;
+	--ui-secondary-light: #3d4349;
+	--ui-secondary-dark: #adb5bd;
 
-  /* Colors - Semantic */
-  --ui-success: #4caf50;
-  --ui-success-light: #1b3d1c;
-  --ui-warning: #ffca28;
-  --ui-warning-light: #3d3515;
-  --ui-danger: #f44336;
-  --ui-danger-light: #3d1a18;
-  --ui-info: #29b6f6;
-  --ui-info-light: #153544;
+	/* Colors - Semantic */
+	--ui-success: #4caf50;
+	--ui-success-light: #1b3d1c;
+	--ui-warning: #ffca28;
+	--ui-warning-light: #3d3515;
+	--ui-danger: #f44336;
+	--ui-danger-light: #3d1a18;
+	--ui-info: #29b6f6;
+	--ui-info-light: #153544;
 
-  /* Surfaces */
-  --ui-surface: #1e1e1e;
-  --ui-surface-variant: #2d2d2d;
-  --ui-surface-elevated: #333333;
-  --ui-background: #121212;
+	/* Surfaces */
+	--ui-surface: #1e1e1e;
+	--ui-surface-variant: #2d2d2d;
+	--ui-surface-elevated: #333333;
+	--ui-background: #121212;
 
-  /* Text */
-  --ui-text: #e0e0e0;
-  --ui-text-secondary: #a0a0a0;
-  --ui-text-muted: #707070;
-  --ui-text-inverse: #121212;
+	/* Text */
+	--ui-text: #e0e0e0;
+	--ui-text-secondary: #a0a0a0;
+	--ui-text-muted: #707070;
+	--ui-text-inverse: #121212;
 
-  /* Borders */
-  --ui-border-color: #404040;
-  --ui-border-color-light: #333333;
-  --ui-border-color-dark: #505050;
+	/* Borders */
+	--ui-border-color: #404040;
+	--ui-border-color-light: #333333;
+	--ui-border-color-dark: #505050;
 
-  /* Interactive States */
-  --ui-hover: #2a2a2a;
-  --ui-active: #333333;
-  --ui-focus-ring: 0 0 0 3px var(--ui-primary-alpha);
-  --ui-disabled-bg: #2d2d2d;
-  --ui-disabled-text: #606060;
+	/* Interactive States */
+	--ui-hover: #2a2a2a;
+	--ui-active: #333333;
+	--ui-focus-ring: 0 0 0 3px var(--ui-primary-alpha);
+	--ui-disabled-bg: #2d2d2d;
+	--ui-disabled-text: #606060;
 
-  /* Overlays */
-  --ui-overlay: rgba(0, 0, 0, 0.7);
-  --ui-backdrop: rgba(30, 30, 30, 0.9);
+	/* Overlays */
+	--ui-overlay: rgba(0, 0, 0, 0.7);
+	--ui-backdrop: rgba(30, 30, 30, 0.9);
 }

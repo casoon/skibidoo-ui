@@ -2,29 +2,29 @@
 import type { DatePickerProps } from "../../types/index.js";
 
 interface Props extends DatePickerProps {
-  __id?: string;
-  __hydrate?: boolean;
+	__id?: string;
+	__hydrate?: boolean;
 }
 
 const {
-  name,
-  label,
-  value,
-  min,
-  max,
-  format = "dd.MM.yyyy",
-  placeholder = "TT.MM.JJJJ",
-  required = false,
-  disabled = false,
-  className = "",
-  __id = "datepicker",
-  __hydrate = false,
+	name,
+	label,
+	value,
+	min,
+	max,
+	format = "dd.MM.yyyy",
+	placeholder = "TT.MM.JJJJ",
+	required = false,
+	disabled = false,
+	className = "",
+	__id = "datepicker",
+	__hydrate = false,
 } = Astro.props;
 
 function formatDate(date: string | Date | undefined): string {
-  if (!date) return "";
-  const d = typeof date === "string" ? new Date(date) : date;
-  return d.toISOString().split("T")[0];
+	if (!date) return "";
+	const d = typeof date === "string" ? new Date(date) : date;
+	return d.toISOString().split("T")[0];
 }
 ---
 

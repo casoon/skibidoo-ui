@@ -1,27 +1,27 @@
 ---
-import type { FormProps, FormField } from "../../types/index.js";
+import type { FormField, FormProps } from "../../types/index.js";
 
 interface Props extends FormProps {
-  __id?: string;
-  __hydrate?: boolean;
+	__id?: string;
+	__hydrate?: boolean;
 }
 
 const {
-  fields,
-  values = {},
-  action,
-  method = "POST",
-  layout = "vertical",
-  submitLabel = "Absenden",
-  resetLabel = "Zuruecksetzen",
-  showReset = false,
-  className = "",
-  __id = "form",
-  __hydrate = false,
+	fields,
+	values = {},
+	action,
+	method = "POST",
+	layout = "vertical",
+	submitLabel = "Absenden",
+	resetLabel = "Zuruecksetzen",
+	showReset = false,
+	className = "",
+	__id = "form",
+	__hydrate = false,
 } = Astro.props;
 
 function getFieldValue(field: FormField): unknown {
-  return values[field.name] ?? field.defaultValue ?? "";
+	return values[field.name] ?? field.defaultValue ?? "";
 }
 ---
 

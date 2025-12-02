@@ -1,44 +1,48 @@
 ---
 export interface Props {
-  variant?: 'default' | 'bordered' | 'elevated';
-  padding?: 'none' | 'sm' | 'md' | 'lg';
-  href?: string;
-  class?: string;
+	variant?: "default" | "bordered" | "elevated";
+	padding?: "none" | "sm" | "md" | "lg";
+	href?: string;
+	class?: string;
 }
 
 const {
-  variant = 'default',
-  padding = 'md',
-  href,
-  class: className = '',
-  ...attrs
+	variant = "default",
+	padding = "md",
+	href,
+	class: className = "",
+	...attrs
 } = Astro.props;
 
 const variants: Record<string, string> = {
-  default: 'bg-white',
-  bordered: 'bg-white border border-gray-200',
-  elevated: 'bg-white shadow-lg',
+	default: "bg-white",
+	bordered: "bg-white border border-gray-200",
+	elevated: "bg-white shadow-lg",
 };
 
 const paddings: Record<string, string> = {
-  none: '',
-  sm: 'p-3',
-  md: 'p-4',
-  lg: 'p-6',
+	none: "",
+	sm: "p-3",
+	md: "p-4",
+	lg: "p-6",
 };
 
-const baseClasses = 'rounded-lg overflow-hidden';
-const interactiveClasses = href ? 'cursor-pointer hover:shadow-md transition-shadow' : '';
+const baseClasses = "rounded-lg overflow-hidden";
+const interactiveClasses = href
+	? "cursor-pointer hover:shadow-md transition-shadow"
+	: "";
 
 const classes = [
-  baseClasses,
-  variants[variant],
-  paddings[padding],
-  interactiveClasses,
-  className,
-].filter(Boolean).join(' ');
+	baseClasses,
+	variants[variant],
+	paddings[padding],
+	interactiveClasses,
+	className,
+]
+	.filter(Boolean)
+	.join(" ");
 
-const Tag = href ? 'a' : 'div';
+const Tag = href ? "a" : "div";
 ---
 
 {href ? (

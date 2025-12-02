@@ -1,32 +1,31 @@
 // @casoon/skibidoo-ui - SSR-first UI Components
 // Built on @casoon/fragment-renderer
 
-// Runtime
-export { createUIFramework } from "./runtime/index.js";
-export type { UIFramework } from "./runtime/index.js";
-
+export type { UIComponentDef } from "./registry.js";
 // Registry - central component registration
 export {
-  uiComponentDefs,
-  createUIRegistry,
-  createPartialRegistry,
-  createRegistryByCategory,
-  getComponentDef,
-  listComponentIds,
+	createPartialRegistry,
+	createRegistryByCategory,
+	createUIRegistry,
+	getComponentDef,
+	listComponentIds,
+	uiComponentDefs,
 } from "./registry.js";
-export type { UIComponentDef } from "./registry.js";
+export type { UIFramework } from "./runtime/index.js";
+// Runtime
+export { createUIFramework } from "./runtime/index.js";
 
 // Types
 export type {
-  UIFrameworkOptions,
-  ComponentMeta,
-  GridColumn,
-  GridProps,
-  GridState,
-  PaginationOptions,
-  FormField,
-  FormProps,
-  FormState,
-  ModalProps,
-  DatePickerProps,
+	ComponentMeta,
+	DatePickerProps,
+	FormField,
+	FormProps,
+	FormState,
+	GridColumn,
+	GridProps,
+	GridState,
+	ModalProps,
+	PaginationOptions,
+	UIFrameworkOptions,
 } from "./types/index.js";

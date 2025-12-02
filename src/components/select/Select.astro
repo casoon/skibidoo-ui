@@ -1,59 +1,61 @@
 ---
 export interface SelectOption {
-  value: string;
-  label: string;
-  disabled?: boolean;
+	value: string;
+	label: string;
+	disabled?: boolean;
 }
 
 export interface Props {
-  name: string;
-  options: SelectOption[];
-  label?: string;
-  placeholder?: string;
-  value?: string;
-  disabled?: boolean;
-  required?: boolean;
-  error?: string;
-  hint?: string;
-  size?: 'sm' | 'md' | 'lg';
-  class?: string;
-  id?: string;
+	name: string;
+	options: SelectOption[];
+	label?: string;
+	placeholder?: string;
+	value?: string;
+	disabled?: boolean;
+	required?: boolean;
+	error?: string;
+	hint?: string;
+	size?: "sm" | "md" | "lg";
+	class?: string;
+	id?: string;
 }
 
 const {
-  name,
-  options,
-  label,
-  placeholder,
-  value,
-  disabled = false,
-  required = false,
-  error,
-  hint,
-  size = 'md',
-  class: className = '',
-  id = name,
-  ...attrs
+	name,
+	options,
+	label,
+	placeholder,
+	value,
+	disabled = false,
+	required = false,
+	error,
+	hint,
+	size = "md",
+	class: className = "",
+	id = name,
+	...attrs
 } = Astro.props;
 
 const sizes: Record<string, string> = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-base',
-  lg: 'px-4 py-3 text-lg',
+	sm: "px-3 py-1.5 text-sm",
+	md: "px-4 py-2 text-base",
+	lg: "px-4 py-3 text-lg",
 };
 
 const selectClasses = [
-  'block w-full rounded-lg border transition-colors appearance-none',
-  'focus:outline-none focus:ring-2 focus:ring-offset-0',
-  'bg-no-repeat bg-right',
-  error 
-    ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
-  disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white',
-  sizes[size],
-  'pr-10',
-  className,
-].filter(Boolean).join(' ');
+	"block w-full rounded-lg border transition-colors appearance-none",
+	"focus:outline-none focus:ring-2 focus:ring-offset-0",
+	"bg-no-repeat bg-right",
+	error
+		? "border-red-500 focus:border-red-500 focus:ring-red-500"
+		: "border-gray-300 focus:border-blue-500 focus:ring-blue-500",
+	disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white",
+	sizes[size],
+	"pr-10",
+	className,
+]
+	.filter(Boolean)
+	.join(" ");
 ---
 
 <div class="w-full relative">

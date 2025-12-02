@@ -4,44 +4,44 @@
  */
 
 export interface Props {
-  variant?: "mask-reveal" | "simple" | "parallax" | "video";
-  logoUrl?: string;
-  backgroundUrl?: string;
-  backgroundSecondaryUrl?: string;
-  videoUrl?: string;
-  height?: "full" | "large" | "medium" | "small";
-  overlayColor?: string;
-  overlayOpacity?: number;
-  maskColor?: string;
-  animationDuration?: number;
-  pauseDuration?: number;
-  logoSize?: number;
-  __id?: string;
-  __hydrate?: boolean;
+	variant?: "mask-reveal" | "simple" | "parallax" | "video";
+	logoUrl?: string;
+	backgroundUrl?: string;
+	backgroundSecondaryUrl?: string;
+	videoUrl?: string;
+	height?: "full" | "large" | "medium" | "small";
+	overlayColor?: string;
+	overlayOpacity?: number;
+	maskColor?: string;
+	animationDuration?: number;
+	pauseDuration?: number;
+	logoSize?: number;
+	__id?: string;
+	__hydrate?: boolean;
 }
 
 const {
-  variant = "simple",
-  logoUrl,
-  backgroundUrl,
-  backgroundSecondaryUrl,
-  videoUrl,
-  height = "full",
-  overlayColor = "black",
-  overlayOpacity = 40,
-  maskColor = "white",
-  animationDuration = 5,
-  pauseDuration = 1.5,
-  logoSize = 10,
-  __id = `hero-${Math.random().toString(36).slice(2, 9)}`,
-  __hydrate = false,
+	variant = "simple",
+	logoUrl,
+	backgroundUrl,
+	backgroundSecondaryUrl,
+	videoUrl,
+	height = "full",
+	overlayColor = "black",
+	overlayOpacity = 40,
+	maskColor = "white",
+	animationDuration = 5,
+	pauseDuration = 1.5,
+	logoSize = 10,
+	__id = `hero-${Math.random().toString(36).slice(2, 9)}`,
+	__hydrate = false,
 } = Astro.props;
 
 const heightClasses: Record<string, string> = {
-  full: "h-screen",
-  large: "h-[80vh]",
-  medium: "h-[60vh]",
-  small: "h-[40vh]",
+	full: "h-screen",
+	large: "h-[80vh]",
+	medium: "h-[60vh]",
+	small: "h-[40vh]",
 };
 const heightClass = heightClasses[height];
 ---

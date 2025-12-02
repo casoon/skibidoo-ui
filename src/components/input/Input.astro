@@ -1,53 +1,55 @@
 ---
 export interface Props {
-  type?: 'text' | 'email' | 'password' | 'number' | 'tel' | 'url' | 'search';
-  name: string;
-  label?: string;
-  placeholder?: string;
-  value?: string | number;
-  disabled?: boolean;
-  readonly?: boolean;
-  required?: boolean;
-  error?: string;
-  hint?: string;
-  size?: 'sm' | 'md' | 'lg';
-  class?: string;
-  id?: string;
+	type?: "text" | "email" | "password" | "number" | "tel" | "url" | "search";
+	name: string;
+	label?: string;
+	placeholder?: string;
+	value?: string | number;
+	disabled?: boolean;
+	readonly?: boolean;
+	required?: boolean;
+	error?: string;
+	hint?: string;
+	size?: "sm" | "md" | "lg";
+	class?: string;
+	id?: string;
 }
 
 const {
-  type = 'text',
-  name,
-  label,
-  placeholder,
-  value,
-  disabled = false,
-  readonly = false,
-  required = false,
-  error,
-  hint,
-  size = 'md',
-  class: className = '',
-  id = name,
-  ...attrs
+	type = "text",
+	name,
+	label,
+	placeholder,
+	value,
+	disabled = false,
+	readonly = false,
+	required = false,
+	error,
+	hint,
+	size = "md",
+	class: className = "",
+	id = name,
+	...attrs
 } = Astro.props;
 
 const sizes: Record<string, string> = {
-  sm: 'px-3 py-1.5 text-sm',
-  md: 'px-4 py-2 text-base',
-  lg: 'px-4 py-3 text-lg',
+	sm: "px-3 py-1.5 text-sm",
+	md: "px-4 py-2 text-base",
+	lg: "px-4 py-3 text-lg",
 };
 
 const inputClasses = [
-  'block w-full rounded-lg border transition-colors',
-  'focus:outline-none focus:ring-2 focus:ring-offset-0',
-  error 
-    ? 'border-red-500 focus:border-red-500 focus:ring-red-500' 
-    : 'border-gray-300 focus:border-blue-500 focus:ring-blue-500',
-  disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white',
-  sizes[size],
-  className,
-].filter(Boolean).join(' ');
+	"block w-full rounded-lg border transition-colors",
+	"focus:outline-none focus:ring-2 focus:ring-offset-0",
+	error
+		? "border-red-500 focus:border-red-500 focus:ring-red-500"
+		: "border-gray-300 focus:border-blue-500 focus:ring-blue-500",
+	disabled ? "bg-gray-100 cursor-not-allowed" : "bg-white",
+	sizes[size],
+	className,
+]
+	.filter(Boolean)
+	.join(" ");
 ---
 
 <div class="w-full">

@@ -2,22 +2,22 @@
 import type { ModalProps } from "../../types/index.js";
 
 interface Props extends ModalProps {
-  __id?: string;
-  __hydrate?: boolean;
-  __content?: string;
+	__id?: string;
+	__hydrate?: boolean;
+	__content?: string;
 }
 
 const {
-  title,
-  size = "md",
-  closable = true,
-  closeOnOverlay = true,
-  closeOnEscape = true,
-  showFooter = true,
-  className = "",
-  __id = "modal",
-  __hydrate = false,
-  __content = "",
+	title,
+	size = "md",
+	closable = true,
+	closeOnOverlay = true,
+	closeOnEscape = true,
+	showFooter = true,
+	className = "",
+	__id = "modal",
+	__hydrate = false,
+	__content = "",
 } = Astro.props;
 ---
 

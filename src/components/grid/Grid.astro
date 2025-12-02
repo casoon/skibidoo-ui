@@ -1,37 +1,81 @@
 ---
-import type { GridProps, GridColumn } from "../../types/index.js";
+/**
+ * Grid Component - SSR-first mit HTMX für serverseitige Sortierung, Paginierung und Filterung
+ *
+ * Verwendung:
+ * - `endpoint`: API-URL für serverseitige Datenverarbeitung (required für HTMX-Modus)
+ * - `data`: Initiale Daten (werden vom Server bei Interaktion neu geladen)
+ * - Alle Sortierung/Paginierung/Filterung erfolgt serverseitig via HTMX
+ */
+import type { GridColumn, GridProps } from "../../types/index.js";
 
 interface Props extends GridProps {
-  __id?: string;
-  __hydrate?: boolean;
+	__id?: string;
+	endpoint?: string;
+	currentPage?: number;
+	totalItems?: number;
+	sortField?: string;
+	sortDirection?: "asc" | "desc";
+	filterValue?: string;
+	selectedIds?: (string | number)[];
 }
 
 const {
-  columns,
-  data,
-  pagination = true,
-  sorting = true,
-  filtering = false,
-  selection = "none",
-  rowKey = "id",
-  emptyText = "Keine Daten vorhanden",
-  loading = false,
-  className = "",
-  __id = "grid",
-  __hydrate = false,
+	columns,
+	data,
+	pagination = true,
+	sorting = true,
+	filtering = false,
+	selection = "none",
+	rowKey = "id",
+	emptyText = "Keine Daten vorhanden",
+	loading = false,
+	className = "",
+	__id = "grid",
+	endpoint,
+	currentPage = 1,
+	totalItems,
+	sortField,
+	sortDirection,
+	filterValue = "",
+	selectedIds = [],
 } = Astro.props;
 
-const paginationConfig = typeof pagination === "object" ? pagination : { pageSize: 10 };
+const paginationConfig =
+	typeof pagination === "object" ? pagination : { pageSize: 10 };
 const pageSize = paginationConfig.pageSize ?? 10;
-const totalPages = Math.ceil(data.length / pageSize);
-const displayData = data.slice(0, pageSize);
+
+const total = totalItems ?? data.length;
+const totalPages = Math.ceil(total / pageSize);
+const isFirstPage = currentPage <= 1;
+const isLastPage = currentPage >= totalPages;
+
+function buildQueryParams(overrides: Record<string, string | number> = {}) {
+	const params = new URLSearchParams();
+	params.set("page", String(overrides.page ?? currentPage));
+	params.set("pageSize", String(pageSize));
+	if (sortField || overrides.sortField) {
+		params.set("sortField", String(overrides.sortField ?? sortField));
+		params.set(
+			"sortDirection",
+			String(overrides.sortDirection ?? sortDirection ?? "asc"),
+		);
+	}
+	if (filterValue || overrides.filter !== undefined) {
+		params.set("filter", String(overrides.filter ?? filterValue));
+	}
+	return params.toString();
+}
+
+function getNextSortDirection(field: string): "asc" | "desc" {
+	if (sortField !== field) return "asc";
+	return sortDirection === "asc" ? "desc" : "asc";
+}
 ---
 
 <div
   class:list={["ui-grid", className, { "ui-grid--loading": loading }]}
   id={__id}
-  data-component="grid"
-  data-props={JSON.stringify({ columns: columns.map(c => c.field), pagination, sorting, filtering, selection, rowKey, pageSize })}
 >
   {loading && (
     <div class="ui-grid__loader">
@@ -39,9 +83,24 @@ const displayData = data.slice(0, pageSize);
     </div>
   )}
 
-  {filtering && (
+  {filtering && endpoint && (
     <div class="ui-grid__toolbar">
-      <input type="text" class="ui-grid__search" placeholder="Suchen..." data-action="search" />
+      <input 
+        type="search" 
+        class="ui-grid__search" 
+        placeholder="Suchen..." 
+        name="filter"
+        value={filterValue}
+        hx-get={endpoint}
+        hx-trigger="input changed delay:300ms, search"
+        hx-target={"#" + __id}
+        hx-swap="outerHTML"
+        hx-include="this"
+      />
+      <input type="hidden" name="page" value="1" />
+      <input type="hidden" name="pageSize" value={pageSize} />
+      {sortField && <input type="hidden" name="sortField" value={sortField} />}
+      {sortDirection && <input type="hidden" name="sortDirection" value={sortDirection} />}
     </div>
   )}
 
@@ -52,80 +111,149 @@ const displayData = data.slice(0, pageSize);
           {selection !== "none" && (
             <th class="ui-grid__header ui-grid__header--checkbox">
               {selection === "multiple" && (
-                <input type="checkbox" class="ui-grid__checkbox-all" data-action="select-all" />
+                <input 
+                  type="checkbox" 
+                  class="ui-grid__checkbox-all"
+                  checked={selectedIds.length === data.length && data.length > 0}
+                />
               )}
             </th>
           )}
-          {columns.map((col: GridColumn) => (
-            <th
-              class:list={[
-                "ui-grid__header",
-                { "ui-grid__header--sortable": sorting && col.sortable !== false },
-                col.align ? `ui-grid__header--${col.align}` : "",
-              ]}
-              data-field={col.field}
-              style={col.width ? `width: ${typeof col.width === "number" ? col.width + "px" : col.width}` : ""}
-            >
-              <span class="ui-grid__header-text">{col.label}</span>
-              {sorting && col.sortable !== false && (
-                <span class="ui-grid__sort-icon" data-sort="none"></span>
-              )}
-            </th>
-          ))}
+          {columns.map((col: GridColumn) => {
+            const isSortable = sorting && col.sortable !== false;
+            const isCurrentSort = sortField === col.field;
+            const nextDirection = getNextSortDirection(col.field);
+            
+            return (
+              <th
+                class:list={[
+                  "ui-grid__header",
+                  { "ui-grid__header--sortable": isSortable },
+                  { "ui-grid__header--sorted": isCurrentSort },
+                  col.align ? `ui-grid__header--${col.align}` : "",
+                ]}
+                data-field={col.field}
+                style={col.width ? `width: ${typeof col.width === "number" ? col.width + "px" : col.width}` : ""}
+              >
+                {isSortable && endpoint ? (
+                  <button
+                    type="button"
+                    class="ui-grid__sort-btn"
+                    hx-get={`${endpoint}?${buildQueryParams({ sortField: col.field, sortDirection: nextDirection, page: 1 })}`}
+                    hx-target={"#" + __id}
+                    hx-swap="outerHTML"
+                  >
+                    <span class="ui-grid__header-text">{col.label}</span>
+                    <span 
+                      class="ui-grid__sort-icon" 
+                      data-sort={isCurrentSort ? sortDirection : "none"}
+                    ></span>
+                  </button>
+                ) : (
+                  <span class="ui-grid__header-text">{col.label}</span>
+                )}
+              </th>
+            );
+          })}
         </tr>
       </thead>
       <tbody class="ui-grid__body">
-        {displayData.length === 0 ? (
+        {data.length === 0 ? (
           <tr class="ui-grid__row ui-grid__row--empty">
             <td class="ui-grid__cell" colspan={columns.length + (selection !== "none" ? 1 : 0)}>
               {emptyText}
             </td>
           </tr>
         ) : (
-          displayData.map((row: Record<string, unknown>, idx: number) => (
-            <tr class="ui-grid__row" data-row-key={row[rowKey] ?? idx}>
-              {selection !== "none" && (
-                <td class="ui-grid__cell ui-grid__cell--checkbox">
-                  <input type="checkbox" class="ui-grid__checkbox" data-action="select-row" />
-                </td>
-              )}
-              {columns.map((col: GridColumn) => (
-                <td
-                  class:list={["ui-grid__cell", col.align ? `ui-grid__cell--${col.align}` : ""]}
-                  data-field={col.field}
-                >
-                  {String(row[col.field] ?? "")}
-                </td>
-              ))}
-            </tr>
-          ))
+          data.map((row: Record<string, unknown>, idx: number) => {
+            const rowId = row[rowKey] ?? idx;
+            const isSelected = selectedIds.includes(rowId as string | number);
+            
+            return (
+              <tr 
+                class:list={["ui-grid__row", { "ui-grid__row--selected": isSelected }]}
+                data-row-key={rowId}
+              >
+                {selection !== "none" && (
+                  <td class="ui-grid__cell ui-grid__cell--checkbox">
+                    <input 
+                      type="checkbox" 
+                      class="ui-grid__checkbox"
+                      name="selectedIds"
+                      value={String(rowId)}
+                      checked={isSelected}
+                    />
+                  </td>
+                )}
+                {columns.map((col: GridColumn) => (
+                  <td
+                    class:list={["ui-grid__cell", col.align ? `ui-grid__cell--${col.align}` : ""]}
+                    data-field={col.field}
+                  >
+                    {String(row[col.field] ?? "")}
+                  </td>
+                ))}
+              </tr>
+            );
+          })
         )}
       </tbody>
     </table>
   </div>
 
-  {pagination && totalPages > 1 && (
+  {pagination && totalPages > 0 && (
     <div class="ui-grid__pagination">
-      <button class="ui-grid__page-btn" data-action="first" disabled>&laquo;</button>
-      <button class="ui-grid__page-btn" data-action="prev" disabled>&lsaquo;</button>
-      <span class="ui-grid__page-info">
-        Seite <span data-page-current>1</span> von <span data-page-total>{totalPages}</span>
-      </span>
-      <button class="ui-grid__page-btn" data-action="next">&rsaquo;</button>
-      <button class="ui-grid__page-btn" data-action="last">&raquo;</button>
+      {endpoint ? (
+        <>
+          <button 
+            class="ui-grid__page-btn" 
+            disabled={isFirstPage}
+            hx-get={`${endpoint}?${buildQueryParams({ page: 1 })}`}
+            hx-target={"#" + __id}
+            hx-swap="outerHTML"
+          >&laquo;</button>
+          <button 
+            class="ui-grid__page-btn" 
+            disabled={isFirstPage}
+            hx-get={`${endpoint}?${buildQueryParams({ page: currentPage - 1 })}`}
+            hx-target={"#" + __id}
+            hx-swap="outerHTML"
+          >&lsaquo;</button>
+          <span class="ui-grid__page-info">
+            Seite <strong>{currentPage}</strong> von <strong>{totalPages}</strong>
+          </span>
+          <button 
+            class="ui-grid__page-btn" 
+            disabled={isLastPage}
+            hx-get={`${endpoint}?${buildQueryParams({ page: currentPage + 1 })}`}
+            hx-target={"#" + __id}
+            hx-swap="outerHTML"
+          >&rsaquo;</button>
+          <button 
+            class="ui-grid__page-btn" 
+            disabled={isLastPage}
+            hx-get={`${endpoint}?${buildQueryParams({ page: totalPages })}`}
+            hx-target={"#" + __id}
+            hx-swap="outerHTML"
+          >&raquo;</button>
+        </>
+      ) : (
+        <>
+          <button class="ui-grid__page-btn" disabled>&laquo;</button>
+          <button class="ui-grid__page-btn" disabled>&lsaquo;</button>
+          <span class="ui-grid__page-info">
+            Seite <strong>1</strong> von <strong>1</strong>
+          </span>
+          <button class="ui-grid__page-btn" disabled>&rsaquo;</button>
+          <button class="ui-grid__page-btn" disabled>&raquo;</button>
+        </>
+      )}
       {paginationConfig.showTotal && (
-        <span class="ui-grid__total">({data.length} Eintraege)</span>
+        <span class="ui-grid__total">({total} Einträge)</span>
       )}
     </div>
   )}
 </div>
-
-{__hydrate && (
-  <script define:vars={{ gridId: __id }}>
-    window.__UI_HYDRATE__ = window.__UI_HYDRATE__ || [];
-    window.__UI_HYDRATE__.push(gridId);
-  </script>
-)}
 
 <style>
   .ui-grid {
@@ -184,6 +312,12 @@ const displayData = data.slice(0, pageSize);
     font-size: inherit;
   }
 
+  .ui-grid__search:focus {
+    outline: none;
+    border-color: var(--ui-primary, #0066cc);
+    box-shadow: 0 0 0 2px var(--ui-primary-alpha, rgba(0, 102, 204, 0.2));
+  }
+
   .ui-grid__wrapper {
     overflow-x: auto;
   }
@@ -204,10 +338,28 @@ const displayData = data.slice(0, pageSize);
   }
 
   .ui-grid__header--sortable {
-    cursor: pointer;
+    padding: 0;
   }
 
-  .ui-grid__header--sortable:hover {
+  .ui-grid__sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    padding: var(--ui-space-sm, 8px) var(--ui-space-md, 12px);
+    background: transparent;
+    border: none;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .ui-grid__sort-btn:hover {
+    background: var(--ui-hover, #eee);
+  }
+
+  .ui-grid__header--sorted {
     background: var(--ui-hover, #eee);
   }
 
@@ -217,21 +369,21 @@ const displayData = data.slice(0, pageSize);
 
   .ui-grid__sort-icon {
     display: inline-block;
-    margin-left: 4px;
     opacity: 0.3;
+    font-size: 0.8em;
   }
 
   .ui-grid__sort-icon::after {
-    content: "95";
+    content: "↕";
   }
 
   .ui-grid__sort-icon[data-sort="asc"]::after {
-    content: "91";
+    content: "↑";
     opacity: 1;
   }
 
   .ui-grid__sort-icon[data-sort="desc"]::after {
-    content: "93";
+    content: "↓";
     opacity: 1;
   }
 
@@ -245,7 +397,7 @@ const displayData = data.slice(0, pageSize);
   }
 
   .ui-grid__row--selected {
-    background: var(--grid-row-selected);
+    background: var(--grid-row-selected) !important;
   }
 
   .ui-grid__row--empty {
@@ -260,6 +412,13 @@ const displayData = data.slice(0, pageSize);
   .ui-grid__cell--center { text-align: center; }
   .ui-grid__cell--right { text-align: right; }
   .ui-grid__cell--checkbox { width: 40px; text-align: center; }
+
+  .ui-grid__checkbox,
+  .ui-grid__checkbox-all {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
 
   .ui-grid__pagination {
     display: flex;
@@ -277,6 +436,7 @@ const displayData = data.slice(0, pageSize);
     background: var(--ui-surface, #fff);
     cursor: pointer;
     transition: background 0.15s;
+    font-size: inherit;
   }
 
   .ui-grid__page-btn:hover:not(:disabled) {
@@ -295,5 +455,10 @@ const displayData = data.slice(0, pageSize);
   .ui-grid__total {
     margin-left: auto;
     color: var(--ui-text-muted, #888);
+  }
+
+  .ui-grid.htmx-request {
+    opacity: 0.7;
+    pointer-events: none;
   }
 </style>
