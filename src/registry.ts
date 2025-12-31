@@ -40,7 +40,8 @@ export const uiComponentDefs: UIComponentDef[] = [
 		meta: {
 			category: "general",
 			tags: ["interactive", "action"],
-			description: "Button component with variants (primary, secondary, outline, ghost, danger)",
+			description:
+				"Button component with variants (primary, secondary, outline, ghost, danger)",
 		},
 	},
 	{
