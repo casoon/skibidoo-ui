@@ -4,9 +4,9 @@
  * Components are statically imported to work with Astro's compilation.
  */
 import type { ComponentMeta, RegistryEntry } from "@casoon/fragment-renderer";
-import Alert from "./components/alert/Alert.astro";
 
 // Static imports for all components
+import Alert from "./components/alert/Alert.astro";
 import Button from "./components/button/Button.astro";
 import Card from "./components/card/Card.astro";
 import DatePicker from "./components/datepicker/DatePicker.astro";
@@ -15,6 +15,9 @@ import Grid from "./components/grid/Grid.astro";
 import Input from "./components/input/Input.astro";
 import Modal from "./components/modal/Modal.astro";
 import Select from "./components/select/Select.astro";
+import Toast from "./components/toast/Toast.astro";
+import ToastContainer from "./components/toast/ToastContainer.astro";
+
 import { gridStyles } from "./styles/grid.js";
 
 /**
@@ -37,25 +40,25 @@ export const uiComponentDefs: UIComponentDef[] = [
 		meta: {
 			category: "general",
 			tags: ["interactive", "action"],
-			description: "Button with variants",
+			description: "Button component with variants (primary, secondary, outline, ghost, danger)",
 		},
 	},
 	{
 		id: "ui-card",
 		component: Card,
 		meta: {
-			category: "general",
-			tags: ["layout", "container"],
-			description: "Card container",
+			category: "layout",
+			tags: ["container", "surface"],
+			description: "Card container with variants (default, bordered, elevated)",
 		},
 	},
 	{
 		id: "ui-alert",
 		component: Alert,
 		meta: {
-			category: "general",
-			tags: ["feedback", "notification"],
-			description: "Alert box",
+			category: "feedback",
+			tags: ["notification", "message"],
+			description: "Alert box with variants (info, success, warning, error)",
 		},
 	},
 	{
@@ -63,8 +66,8 @@ export const uiComponentDefs: UIComponentDef[] = [
 		component: Input,
 		meta: {
 			category: "form",
-			tags: ["interactive", "input"],
-			description: "Text input",
+			tags: ["interactive", "input", "text"],
+			description: "Text input with validation states and sizes",
 		},
 	},
 	{
@@ -72,8 +75,8 @@ export const uiComponentDefs: UIComponentDef[] = [
 		component: Select,
 		meta: {
 			category: "form",
-			tags: ["interactive", "dropdown"],
-			description: "Select dropdown",
+			tags: ["interactive", "dropdown", "picker"],
+			description: "Select dropdown with custom styling",
 		},
 	},
 	{
@@ -81,8 +84,8 @@ export const uiComponentDefs: UIComponentDef[] = [
 		component: Form,
 		meta: {
 			category: "form",
-			tags: ["interactive", "input"],
-			description: "Dynamic form",
+			tags: ["interactive", "validation"],
+			description: "Dynamic form with Zod validation",
 		},
 	},
 	{
@@ -90,8 +93,8 @@ export const uiComponentDefs: UIComponentDef[] = [
 		component: DatePicker,
 		meta: {
 			category: "form",
-			tags: ["interactive", "date"],
-			description: "Date picker",
+			tags: ["interactive", "date", "calendar"],
+			description: "Date picker with calendar popup",
 		},
 	},
 	{
@@ -99,8 +102,8 @@ export const uiComponentDefs: UIComponentDef[] = [
 		component: Grid,
 		meta: {
 			category: "data",
-			tags: ["table", "sortable", "paginated"],
-			description: "Data grid",
+			tags: ["table", "sortable", "paginated", "data-display"],
+			description: "Data grid with sorting, filtering, and pagination",
 		},
 		styles: gridStyles,
 	},
@@ -109,8 +112,26 @@ export const uiComponentDefs: UIComponentDef[] = [
 		component: Modal,
 		meta: {
 			category: "overlay",
-			tags: ["interactive", "dialog"],
-			description: "Modal dialog",
+			tags: ["interactive", "dialog", "popup"],
+			description: "Modal dialog with backdrop",
+		},
+	},
+	{
+		id: "ui-toast",
+		component: Toast,
+		meta: {
+			category: "feedback",
+			tags: ["notification", "temporary", "message"],
+			description: "Toast notification with auto-dismiss",
+		},
+	},
+	{
+		id: "ui-toast-container",
+		component: ToastContainer,
+		meta: {
+			category: "feedback",
+			tags: ["notification", "container", "queue"],
+			description: "Toast container for managing multiple toast notifications",
 		},
 	},
 ];
@@ -179,3 +200,20 @@ export function listCategories(): string[] {
 		),
 	] as string[];
 }
+
+/**
+ * Export all components for direct import
+ */
+export {
+	Alert,
+	Button,
+	Card,
+	DatePicker,
+	Form,
+	Grid,
+	Input,
+	Modal,
+	Select,
+	Toast,
+	ToastContainer,
+};

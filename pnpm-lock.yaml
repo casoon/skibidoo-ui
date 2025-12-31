@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@casoon/fragment-renderer':
-        specifier: 0.1.1
-        version: 0.1.1(astro@5.16.3(@types/node@22.19.1)(rollup@4.53.3)(typescript@5.9.3))
+        specifier: link:../fragment-renderer
+        version: link:../fragment-renderer
       alpinejs:
         specifier: '>=3.14.0'
         version: 3.15.2
@@ -135,12 +135,6 @@ packages:
   '@capsizecss/unpack@3.0.1':
     resolution: {integrity: sha512-8XqW8xGn++Eqqbz3e9wKuK7mxryeRjs4LOHLxbh2lwKeSbuNR4NFifDZT4KzvjU6HMOPbiNTsWpniK5EJfTWkg==}
     engines: {node: '>=18'}
-
-  '@casoon/fragment-renderer@0.1.1':
-    resolution: {integrity: sha512-B86JSm99uCWg1x5DyvuLIwO1Wl6ZM++ajohQrau1jnSCwrYWjXYvwSW9Haf+NTsaUZSrpk+7tVf2RvXfHmwFwQ==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      astro: '>=4.0.0'
 
   '@emnapi/runtime@1.7.1':
     resolution: {integrity: sha512-PVtJr5CmLwYAU9PZDMITZoR5iAOShYREoR45EyyLrbntV50mdePTgUn4AmOw90Ifcj+x2kRjdzr1HP3RrNiHGA==}
@@ -2016,10 +2010,6 @@ snapshots:
   '@capsizecss/unpack@3.0.1':
     dependencies:
       fontkit: 2.0.4
-
-  '@casoon/fragment-renderer@0.1.1(astro@5.16.3(@types/node@22.19.1)(rollup@4.53.3)(typescript@5.9.3))':
-    dependencies:
-      astro: 5.16.3(@types/node@22.19.1)(rollup@4.53.3)(typescript@5.9.3)
 
   '@emnapi/runtime@1.7.1':
     dependencies:

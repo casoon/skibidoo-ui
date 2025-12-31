@@ -1,29 +1,54 @@
 # @casoon/skibidoo-ui
 
-SSR-first UI component library for the AHA-Stack (Astro + HTMX + Alpine.js + Tailwind).
+SSR-first UI component library for the **AHA-Stack** (Astro + HTMX + Alpine.js + Tailwind).
 
 Built on [@casoon/fragment-renderer](https://github.com/casoon/fragment-renderer) for server-side component rendering with automatic style delivery.
 
+[![License: LGPL-3.0](https://img.shields.io/badge/License-LGPL%203.0-blue.svg)](https://opensource.org/licenses/LGPL-3.0)
+[![npm version](https://badge.fury.io/js/@casoon%2Fskibidoo-ui.svg)](https://www.npmjs.com/package/@casoon/skibidoo-ui)
+
 ## Features
 
-- **SSR-First**: Components render on the server with fragment-renderer
-- **Registry Pattern**: Central component registry for dynamic rendering
-- **Style Delivery**: Automatic CSS injection via fragment-renderer
-- **Progressive Enhancement**: Works without JavaScript
-- **HTMX Compatible**: Fragment-based partial updates
-- **TypeScript**: Full type safety
+- ✨ **SSR-First**: Components render on the server with fragment-renderer
+- 🎯 **Registry Pattern**: Central component registry for dynamic rendering
+- 🎨 **Style Delivery**: Automatic CSS injection via fragment-renderer
+- 📈 **Progressive Enhancement**: Works without JavaScript
+- ⚡ **HTMX Compatible**: Fragment-based partial updates
+- 🔒 **TypeScript**: Full type safety
+- 🎭 **11 Production-Ready Components**: From buttons to data grids
 
 ## Installation
 
 ```bash
-npm install @casoon/skibidoo-ui @casoon/fragment-renderer astro
+npm install @casoon/skibidoo-ui @casoon/fragment-renderer
 ```
+
+**Peer Dependencies:**
+```bash
+npm install astro alpinejs htmx.org tailwindcss
+```
+
+## Components Overview
+
+| Component | Category | Description | Alpine.js | HTMX |
+|-----------|----------|-------------|-----------|------|
+| **Button** | General | Button with variants (primary, secondary, outline, ghost, danger) | ✅ | - |
+| **Input** | Form | Text input with validation states | ✅ | - |
+| **Select** | Form | Dropdown with custom styling | - | - |
+| **Card** | Layout | Container with variants (default, bordered, elevated) | - | - |
+| **Alert** | Feedback | Alert box with dismiss (info, success, warning, error) | ✅ | - |
+| **Toast** | Feedback | Auto-dismiss notifications | ✅ | - |
+| **ToastContainer** | Feedback | Queue manager for multiple toasts | ✅ | - |
+| **Form** | Form | Dynamic forms with Zod validation | ✅ | ✅ |
+| **DatePicker** | Form | Calendar popup | ✅ | - |
+| **Grid** | Data | Data table with sorting, filtering, pagination | ✅ | ✅ |
+| **Modal** | Overlay | Dialog with backdrop | ✅ | - |
 
 ## Quick Start
 
-### Using the Registry with fragment-renderer
+### 1. Using the Registry with fragment-renderer
 
-The recommended approach is using the component registry with `@casoon/fragment-renderer`:
+The recommended approach is using the component registry:
 
 ```typescript
 import { createAstroRuntime } from "@casoon/fragment-renderer";
@@ -31,7 +56,7 @@ import { createPartialRegistry } from "@casoon/skibidoo-ui/registry";
 
 // Create runtime with selected components
 const runtime = createAstroRuntime({
-  components: createPartialRegistry(["ui-grid", "ui-form"]),
+  components: createPartialRegistry(["ui-grid", "ui-form", "ui-toast-container"]),
 });
 
 // Render a component by ID
@@ -49,156 +74,530 @@ const html = await runtime.renderToString({
 });
 ```
 
-### Astro Config
+### 2. Direct Import in Astro
 
-Add `@casoon/skibidoo-ui` to your Vite SSR config to enable Astro component compilation:
-
-```javascript
-// astro.config.mjs
-export default defineConfig({
-  vite: {
-    ssr: {
-      noExternal: ["@casoon/skibidoo-ui"],
-    },
-  },
-});
-```
-
-### Direct Component Import
-
-You can also import components directly in Astro pages:
+You can also directly import components in `.astro` files:
 
 ```astro
 ---
-import Grid from "@casoon/skibidoo-ui/src/components/grid/Grid.astro";
-import Form from "@casoon/skibidoo-ui/src/components/form/Form.astro";
+import { Button, Input, Card, Alert } from '@casoon/skibidoo-ui';
 ---
 
-<Grid
-  columns={columns}
-  data={data}
-  pagination={{ pageSize: 10 }}
-  sorting={true}
+<Card variant="bordered" padding="lg">
+  <h2>Login</h2>
+  <form>
+    <Input
+      type="email"
+      name="email"
+      label="E-Mail"
+      required
+      placeholder="mail@example.com"
+    />
+    <Input
+      type="password"
+      name="password"
+      label="Password"
+      required
+    />
+    <Button variant="primary" type="submit" fullWidth>
+      Login
+    </Button>
+  </form>
+</Card>
+
+<Alert variant="success" title="Success!" dismissible>
+  You have successfully logged in.
+</Alert>
+```
+
+## Component Examples
+
+### Button
+
+```astro
+---
+import { Button } from '@casoon/skibidoo-ui';
+---
+
+<!-- Variants -->
+<Button variant="primary">Primary</Button>
+<Button variant="secondary">Secondary</Button>
+<Button variant="outline">Outline</Button>
+<Button variant="ghost">Ghost</Button>
+<Button variant="danger">Delete</Button>
+
+<!-- Sizes -->
+<Button size="sm">Small</Button>
+<Button size="md">Medium</Button>
+<Button size="lg">Large</Button>
+
+<!-- States -->
+<Button loading>Loading...</Button>
+<Button disabled>Disabled</Button>
+
+<!-- As Link -->
+<Button href="/products">View Products</Button>
+```
+
+**Props:**
+```typescript
+{
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
+  size?: "sm" | "md" | "lg";
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  loading?: boolean;
+  fullWidth?: boolean;
+  href?: string;
+}
+```
+
+---
+
+### Input
+
+```astro
+---
+import { Input } from '@casoon/skibidoo-ui';
+---
+
+<!-- Basic Input -->
+<Input
+  name="email"
+  type="email"
+  label="E-Mail Address"
+  placeholder="you@example.com"
+  required
+/>
+
+<!-- With Error -->
+<Input
+  name="password"
+  type="password"
+  label="Password"
+  error="Password must be at least 8 characters"
+/>
+
+<!-- With Hint -->
+<Input
+  name="username"
+  label="Username"
+  hint="Only letters, numbers, and underscores"
+/>
+
+<!-- Disabled -->
+<Input
+  name="readonly-field"
+  value="Cannot edit"
+  disabled
 />
 ```
 
-## Available Components
+**Props:**
+```typescript
+{
+  type?: "text" | "email" | "password" | "number" | "tel" | "url" | "search";
+  name: string;
+  label?: string;
+  placeholder?: string;
+  value?: string | number;
+  disabled?: boolean;
+  readonly?: boolean;
+  required?: boolean;
+  error?: string;
+  hint?: string;
+  size?: "sm" | "md" | "lg";
+}
+```
 
-| Component ID    | Description                    |
-|-----------------|--------------------------------|
-| `ui-button`     | Button with variants           |
-| `ui-card`       | Card container                 |
-| `ui-alert`      | Alert/notification box         |
-| `ui-input`      | Text input field               |
-| `ui-select`     | Select dropdown                |
-| `ui-form`       | Dynamic form with validation   |
-| `ui-datepicker` | Date picker                    |
-| `ui-grid`       | Data grid with sort/filter/pagination |
-| `ui-modal`      | Modal dialog                   |
+---
+
+### Select
+
+```astro
+---
+import { Select } from '@casoon/skibidoo-ui';
+
+const countries = [
+  { value: "de", label: "Germany" },
+  { value: "at", label: "Austria" },
+  { value: "ch", label: "Switzerland" },
+];
+---
+
+<Select
+  name="country"
+  label="Country"
+  options={countries}
+  placeholder="Select country..."
+  required
+/>
+```
+
+**Props:**
+```typescript
+{
+  name: string;
+  options: { value: string; label: string; disabled?: boolean }[];
+  label?: string;
+  placeholder?: string;
+  value?: string;
+  disabled?: boolean;
+  required?: boolean;
+  error?: string;
+  hint?: string;
+  size?: "sm" | "md" | "lg";
+}
+```
+
+---
+
+### Card
+
+```astro
+---
+import { Card } from '@casoon/skibidoo-ui';
+---
+
+<!-- Variants -->
+<Card variant="default">
+  <h3>Default Card</h3>
+  <p>Simple white background</p>
+</Card>
+
+<Card variant="bordered">
+  <h3>Bordered Card</h3>
+  <p>With border</p>
+</Card>
+
+<Card variant="elevated">
+  <h3>Elevated Card</h3>
+  <p>With shadow</p>
+</Card>
+
+<!-- Padding -->
+<Card padding="none">No padding</Card>
+<Card padding="sm">Small padding</Card>
+<Card padding="md">Medium padding</Card>
+<Card padding="lg">Large padding</Card>
+
+<!-- Interactive -->
+<Card href="/products/1" variant="elevated">
+  Click me - I'm a link!
+</Card>
+```
+
+**Props:**
+```typescript
+{
+  variant?: "default" | "bordered" | "elevated";
+  padding?: "none" | "sm" | "md" | "lg";
+  href?: string;
+}
+```
+
+---
+
+### Alert
+
+```astro
+---
+import { Alert } from '@casoon/skibidoo-ui';
+---
+
+<Alert variant="info" title="Information">
+  This is an informational message.
+</Alert>
+
+<Alert variant="success" title="Success!" dismissible>
+  Your changes have been saved.
+</Alert>
+
+<Alert variant="warning" title="Warning">
+  Please review your data before submitting.
+</Alert>
+
+<Alert variant="error" title="Error" dismissible>
+  Something went wrong. Please try again.
+</Alert>
+```
+
+**Props:**
+```typescript
+{
+  variant?: "info" | "success" | "warning" | "error";
+  title?: string;
+  dismissible?: boolean;
+}
+```
+
+**Note:** Requires Alpine.js for `dismissible` functionality.
+
+---
+
+### Toast & ToastContainer
+
+```astro
+---
+import { ToastContainer } from '@casoon/skibidoo-ui';
+---
+
+<!-- Add ToastContainer to your layout -->
+<ToastContainer position="top-right" maxToasts={5} />
+
+<script>
+  // Trigger toast from JavaScript
+  window.toast({
+    variant: 'success',
+    title: 'Saved!',
+    message: 'Your changes have been saved.',
+    duration: 5000, // ms, 0 = no auto-dismiss
+  });
+
+  window.toast({
+    variant: 'error',
+    title: 'Error',
+    message: 'Failed to save changes.',
+    duration: 0, // Manual dismiss only
+  });
+</script>
+```
+
+**ToastContainer Props:**
+```typescript
+{
+  position?: "top-right" | "top-left" | "bottom-right" | "bottom-left" | "top-center" | "bottom-center";
+  maxToasts?: number;
+}
+```
+
+**Toast API:**
+```typescript
+window.toast({
+  variant?: 'info' | 'success' | 'warning' | 'error';
+  title: string;
+  message?: string;
+  duration?: number; // milliseconds, 0 = no auto-dismiss
+});
+```
+
+**Note:** Requires Alpine.js.
+
+---
+
+### Grid (Data Table)
+
+```astro
+---
+import { Grid } from '@casoon/skibidoo-ui';
+
+const users = [
+  { id: 1, name: "Alice", email: "alice@example.com", role: "Admin" },
+  { id: 2, name: "Bob", email: "bob@example.com", role: "User" },
+];
+---
+
+<Grid
+  columns={[
+    { field: "name", label: "Name", sortable: true },
+    { field: "email", label: "E-Mail", sortable: true },
+    { field: "role", label: "Role", sortable: false },
+  ]}
+  data={users}
+  pagination={{ pageSize: 10, showPageNumbers: true }}
+  sorting={true}
+  filters={[
+    { field: "role", type: "select", options: ["Admin", "User"] }
+  ]}
+/>
+```
+
+**Props:** See [Grid Documentation](./docs/components/grid.md)
+
+---
+
+### Form (Dynamic)
+
+```astro
+---
+import { Form } from '@casoon/skibidoo-ui';
+import { z } from 'zod';
+
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8),
+  terms: z.boolean().refine(v => v === true),
+});
+
+const fields = [
+  { name: "email", type: "email", label: "E-Mail", required: true },
+  { name: "password", type: "password", label: "Password", required: true },
+  { name: "terms", type: "checkbox", label: "I agree to the terms" },
+];
+---
+
+<Form
+  fields={fields}
+  schema={schema}
+  submitUrl="/api/register"
+  submitLabel="Register"
+/>
+```
+
+**Props:** See [Form Documentation](./docs/components/form.md)
+
+---
+
+### Modal
+
+```astro
+---
+import { Modal } from '@casoon/skibidoo-ui';
+---
+
+<button x-data x-on:click="$dispatch('open-modal', { id: 'confirm-delete' })">
+  Delete Item
+</button>
+
+<Modal id="confirm-delete" title="Confirm Delete">
+  <p>Are you sure you want to delete this item?</p>
+  <div class="flex gap-2 justify-end mt-4">
+    <button class="btn-secondary" x-on:click="$dispatch('close-modal')">
+      Cancel
+    </button>
+    <button class="btn-danger">
+      Delete
+    </button>
+  </div>
+</Modal>
+```
+
+**Note:** Requires Alpine.js.
+
+---
+
+### DatePicker
+
+```astro
+---
+import { DatePicker } from '@casoon/skibidoo-ui';
+---
+
+<DatePicker
+  name="birthday"
+  label="Birthday"
+  required
+/>
+```
+
+**Note:** Requires Alpine.js.
+
+---
 
 ## Registry Functions
 
 ```typescript
-import {
-  createUIRegistry,        // All components
-  createPartialRegistry,   // Selected components by ID
-  createRegistryByCategory,// Components by category
-  listComponentIds,        // List all IDs
-  listCategories,          // List all categories
-} from "@casoon/skibidoo-ui/registry";
+// Import all components
+import { createUIRegistry } from '@casoon/skibidoo-ui/registry';
+const registry = createUIRegistry();
 
-// Full registry
-const allComponents = createUIRegistry();
+// Import specific components
+import { createPartialRegistry } from '@casoon/skibidoo-ui/registry';
+const registry = createPartialRegistry(['ui-button', 'ui-input', 'ui-card']);
 
-// Partial registry
-const gridOnly = createPartialRegistry(["ui-grid"]);
+// Import by category
+import { createRegistryByCategory } from '@casoon/skibidoo-ui/registry';
+const formRegistry = createRegistryByCategory('form'); // All form components
 
-// By category: "general", "form", "data", "overlay"
-const formComponents = createRegistryByCategory("form");
+// Utility functions
+import { listComponentIds, listCategories, getComponentDef } from '@casoon/skibidoo-ui/registry';
+
+console.log(listComponentIds());
+// ['ui-button', 'ui-input', 'ui-select', ...]
+
+console.log(listCategories());
+// ['general', 'form', 'layout', 'feedback', 'data', 'overlay']
+
+const buttonDef = getComponentDef('ui-button');
+console.log(buttonDef.meta.description);
 ```
 
-## API Endpoint Example
+## Tailwind Configuration
 
-```typescript
-// src/pages/api/users.ts
-import { createAstroRuntime } from "@casoon/fragment-renderer";
-import { createPartialRegistry } from "@casoon/skibidoo-ui/registry";
-import type { APIRoute } from "astro";
+Add to your `tailwind.config.mjs`:
 
-export const GET: APIRoute = async ({ url }) => {
-  const page = parseInt(url.searchParams.get("page") || "1");
-  
-  const runtime = createAstroRuntime({
-    components: createPartialRegistry(["ui-grid"]),
-  });
-
-  const html = await runtime.renderToString({
-    componentId: "ui-grid",
-    props: {
-      columns: gridColumns,
-      data: paginatedData,
-      pagination: { pageSize: 10 },
-      currentPage: page,
-      totalItems: totalCount,
-      endpoint: "/api/users",
-    },
-  });
-
-  return new Response(html, {
-    headers: { "Content-Type": "text/html" },
-  });
+```javascript
+export default {
+  content: [
+    './src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}',
+    './node_modules/@casoon/skibidoo-ui/**/*.{astro,js,ts}',
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
 };
 ```
 
-## Theming
+## Alpine.js Setup
 
-Components use CSS Custom Properties for theming.
+Components using Alpine.js require it to be initialized:
 
-### Built-in Themes
+```astro
+---
+// In your layout
+---
+<html>
+  <head>
+    <!-- ... -->
+  </head>
+  <body>
+    <slot />
+    
+    <script>
+      import Alpine from 'alpinejs';
+      window.Alpine = Alpine;
+      Alpine.start();
+    </script>
+  </body>
+</html>
+```
+
+## HTMX Integration
+
+Components like `Grid` and `Form` work seamlessly with HTMX for partial updates:
 
 ```html
-<link rel="stylesheet" href="@casoon/skibidoo-ui/styles/themes/light.css">
-<link rel="stylesheet" href="@casoon/skibidoo-ui/styles/themes/dark.css">
+<div hx-get="/api/users" hx-trigger="load" hx-swap="innerHTML">
+  <!-- Grid will be loaded via HTMX -->
+</div>
 ```
 
-### Custom Theme
+## TypeScript Support
 
-```css
-:root {
-  --ui-primary: #your-color;
-  --ui-surface: #your-surface;
-  --ui-border-color: #your-border;
-  /* See dist/styles/tokens.css for all variables */
-}
+All components are fully typed:
+
+```typescript
+import type { Props as ButtonProps } from '@casoon/skibidoo-ui/components/button/Button.astro';
+
+const props: ButtonProps = {
+  variant: 'primary',
+  size: 'md',
+  loading: false,
+};
 ```
-
-## Project Structure
-
-```
-src/
-  registry.ts           # Component registry (import from /registry)
-  runtime/              # SSR runtime utilities
-  components/           # Astro components
-    grid/Grid.astro
-    form/Form.astro
-    button/Button.astro
-    card/Card.astro
-    alert/Alert.astro
-    input/Input.astro
-    select/Select.astro
-    modal/Modal.astro
-    datepicker/DatePicker.astro
-  client/               # Client-side hydration
-  styles/               # CSS & themes
-  types/                # TypeScript definitions
-```
-
-## Requirements
-
-- Node.js >= 24
-- Astro >= 5.0
-- @casoon/fragment-renderer >= 0.1.1
 
 ## License
 
-LGPL-3.0
+LGPL-3.0 - See [LICENSE](./LICENSE)
+
+## Contributing
+
+Contributions are welcome! Please open an issue or PR.
+
+## Links
+
+- [GitHub Repository](https://github.com/casoon/skibidoo-ui)
+- [NPM Package](https://www.npmjs.com/package/@casoon/skibidoo-ui)
+- [Fragment Renderer](https://github.com/casoon/fragment-renderer)
+- [Skibidoo E-Commerce](https://github.com/casoon/skibidoo-concept)
