@@ -7,6 +7,8 @@ Built on [@casoon/fragment-renderer](https://github.com/casoon/fragment-renderer
 [![License: LGPL-3.0](https://img.shields.io/badge/License-LGPL%203.0-blue.svg)](https://opensource.org/licenses/LGPL-3.0)
 [![npm version](https://badge.fury.io/js/@casoon%2Fskibidoo-ui.svg)](https://www.npmjs.com/package/@casoon/skibidoo-ui)
 
+**Website:** [skibidoo.casoon.de](https://skibidoo.casoon.de/en/)
+
 ## Features
 
 - ✨ **SSR-First**: Components render on the server with fragment-renderer
