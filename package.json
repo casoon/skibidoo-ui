@@ -1,6 +1,6 @@
 {
   "name": "@casoon/skibidoo-ui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "SSR-first UI component library for Skibidoo - AHA-Stack (Astro + HTMX + Alpine.js + Tailwind)",
   "type": "module",
   "main": "./dist/index.js",
@@ -54,6 +54,7 @@
   ],
   "author": "casoon",
   "license": "MIT",
+  "packageManager": "pnpm@10.26.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/casoon/skibidoo-ui.git"
